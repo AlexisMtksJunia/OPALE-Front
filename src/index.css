@@ -1,0 +1,313 @@
+:root{
+  --bg: #f0f1f2;
+  --panel: #ffffff;
+  --panel-soft: #f7f7f7;
+  --text: #111827;
+  --muted: #6b7280;
+  --brand: #2cd4d9;       /* turquoise */
+  --amber: #f6d68c;       /* jaune */
+  --primary: #93c7a6;     /* bouton principal */
+  --primary-hover: #7db993;
+
+  /* Ombres */
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+  background: radial-gradient(circle at 30% 0%, #e7e8ea, #d9dbde 40%, #cfd1d4 60%, #c1c3c7 100%);
+}
+
+/* ===================== */
+/*        LAYOUT         */
+/* ===================== */
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr; /* Sidebar flexible */
+  gap: 24px;
+  padding: 24px;
+  height: 100%;
+}
+
+.card { background: var(--panel); border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+
+/* Colonne droite (déconnexion + contenu) */
+.right-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ===================== */
+/*        SIDEBAR        */
+/* ===================== */
+
+.sidebar {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  transition: all .3s ease;
+}
+
+/* Logo */
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 14px;
+}
+.brand .logo-full { width: 100%; height: auto; max-width: 280px; }
+.brand .logo-compact { display: none; width: 48px; height: auto; }
+
+/* Navigation */
+.nav { display: flex; flex-direction: column; gap: 8px; }
+
+.nav-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 700;
+  border: none; background: transparent; cursor: pointer;
+  transition: background .2s;
+}
+.nav-btn:hover { background: #f2f2f2; }
+.nav-btn.active { background: #e8f8f8; }
+.nav-label { flex: 1; text-align: left; min-width: 0; }
+.nav-icon-right { flex-shrink: 0; width: 40px; height: 40px; }
+
+/* Footer = bouton Paramètres (icône gauche, texte droite) */
+.sidebar-footer { margin-top: auto; padding-top: 6px; border-top: 1px dashed #e5e7eb; }
+.nav-btn-footer {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--muted);
+  border: none; background: transparent; cursor: pointer;
+  transition: background .2s;
+}
+.nav-btn-footer:hover { background: #f2f2f2; }
+.nav-btn-footer.active { background: #e8f8f8; }
+.nav-btn-footer .nav-icon-left { flex-shrink: 0; width: 40px; height: 40px; }
+
+/* Sidebar compacte (mobile) */
+@media (max-width: 860px) {
+  .app { grid-template-columns: 80px 1fr; }
+
+  .sidebar { align-items: center; padding: 12px 8px; gap: 16px; }
+
+  .brand .logo-full { display: none; }
+  .brand .logo-compact { display: block; }
+
+  .nav-btn { justify-content: center; padding: 12px; }
+  .nav-label { display: none; }
+  .nav-icon-right { margin: 0; }
+
+  .nav-btn-footer { justify-content: center; padding: 12px; }
+  .nav-btn-footer .nav-icon-left { margin: 0; }
+  .sidebar-footer .nav-label { display: none; }
+  .sidebar-footer::after { content: "P"; display: block; color: var(--muted); font-family: 'Nunito', sans-serif; }
+}
+
+/* ===================== */
+/*     TOP DISCONNECT    */
+/* ===================== */
+
+.disconnect-card { align-self: flex-end; padding: 8px; box-shadow: var(--shadow-lg); }
+.btn-disconnect {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; border: none; border-radius: 10px;
+  padding: 8px 12px; cursor: pointer;
+  font-family: 'Nunito', sans-serif; font-size: clamp(16px, 2vw, 22px); font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+.btn-disconnect:hover { box-shadow: var(--shadow-lg); }
+.btn-disconnect img { width: 20px; height: 20px; }
+
+/* ===================== */
+/*        MAIN CARD      */
+/* ===================== */
+
+.main-card { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+.main-inner {
+  position: relative; flex: 1; display: flex; flex-direction: column;
+  padding: 8px; padding-bottom: 10px; /* pour le bouton bas-droit du planning */
+}
+
+/* Titres communs (cohérents planning/promotions) */
+.page-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(28px, 4vw, 50px);
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.page-sub {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(18px, 2.5vw, 32px);
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+/* ===================== */
+/*        CHECKLIST      */
+/* ===================== */
+
+.checklist { display: grid; gap: 14px; margin-top: 12px; }
+.cl-item {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%;
+  background: var(--panel-soft);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.badge {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800;
+}
+.badge.ok { background: var(--brand); color: #fff; }
+.badge.alert { background: var(--amber); color: #111; }
+.badge.checked { box-shadow: inset 0 0 0 2px rgba(0,0,0,.06); }
+.cl-label { flex: 1; font-family: 'Roboto', sans-serif; font-size: clamp(14px, 1.6vw, 22px); font-weight: 500; }
+
+/* Bouton Générer : bas-droite */
+.btn-primary {
+  background: var(--primary); border: none; color: #0b3b24;
+  padding: 14px 20px; border-radius: 10px; cursor: pointer; box-shadow: var(--shadow-md);
+  font-family: 'Nunito', sans-serif; font-size: clamp(16px, 2vw, 26px); font-weight: 600;
+}
+.btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-lg); }
+.btn-generate { position: absolute; right: 20px; bottom: 20px; }
+
+/* ===================== */
+/*     PROMOTIONS PAGE   */
+/* ===================== */
+
+/* En-tête */
+.promos-header {
+  display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* Grille responsive auto-fit (1→n colonnes) */
+.promos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+/* Carte cycle */
+.cycle-card {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px; min-width: 0; box-shadow: var(--shadow-lg);
+}
+
+/* Entête d’un cycle */
+.cycle-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: nowrap;          /* <-- pas de retour à la ligne */
+}
+.cycle-name {
+  flex: 1 1 auto; min-width: 0;
+  font-family: 'Nunito', sans-serif; font-size: clamp(18px, 2vw, 28px); font-weight: 700;
+  border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; background: #fff;
+}
+.cycle-actions { display: flex; gap: 8px; flex: 0 0 auto; }
+
+/* Liste des promotions */
+.promotions { display: flex; flex-direction: column; gap: 10px; }
+
+.empty {
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(14px, 1.6vw, 18px);
+  padding: 8px 4px;
+}
+
+.promo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--panel-soft);
+  border-radius: 12px;
+  min-width: 0;
+  flex-wrap: nowrap;          /* <-- pas de wrap */
+}
+.promo-label {
+  flex: 1 1 auto;             /* occupe l'espace dispo */
+  min-width: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;        /* <-- tronque si trop long */
+}
+@media (max-width: 620px) { .promo-label { white-space: normal; } }
+
+.promo-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+  white-space: nowrap;        /* boutons restent sur la ligne */
+}
+
+/* Boutons secondaires & danger (et version icône-only en mobile) */
+.btn-tertiary,
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 10px; cursor: pointer;
+  font-family: 'Nunito', sans-serif; font-size: clamp(14px, 1.6vw, 18px);
+  line-height: 1; white-space: nowrap; box-shadow: var(--shadow-sm);
+  border: 1px solid transparent; background: #fff;
+}
+.btn-tertiary { background: #eef2f7; border-color: #e3e7ee; color: #0f172a; }
+.btn-tertiary:hover { background: #e7edf7; }
+.btn-danger   { background: #fee2e2; border-color: #fecaca; color: #7f1d1d; }
+.btn-danger:hover { background: #ffcaca; }
+
+/* classe utilitaire : bascule icône seule en mobile */
+.btn-icon-responsive img { display: none; width: 26px; height: 26px; }
+.btn-icon-responsive .btn-label { display: inline; }
+@media (max-width: 620px) {
+  .btn-icon-responsive { padding: 8px; min-width: 44px; min-height: 44px; justify-content: center; }
+  .btn-icon-responsive .btn-label { display: none; }
+  .btn-icon-responsive img { display: block; width: 28px; height: 28px; }
+}
+
+/* Carte “+ Ajouter un cycle” (toujours placée en dernier dans la grille) */
+.add-cycle-card {
+  display: grid; place-items: center;
+  min-height: 140px; padding: 16px;
+  border: 2px dashed #cbd5e1; background: #f8fafc; cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  box-shadow: var(--shadow-md);
+}
+.add-cycle-card img {
+  width: clamp(36px, 6vw, 72px);
+  height: clamp(36px, 6vw, 72px);
+  object-fit: contain; opacity: .9;
+}
+.add-cycle-card:hover { background: #f1f5f9; transform: translateY(-1px); box-shadow: var(--shadow-lg); }
