@@ -36,8 +36,10 @@ function AppLayout() {
 
 export default function App() {
     return (
+
         <Routes>
             <Route element={<AppLayout />}>
+
                 <Route path="/" element={<Navigate to="/planning" replace />} />
                 <Route path="/planning" element={<PlanningMacro />} />
                 <Route path="/promotions" element={<Promotions />} />

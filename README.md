@@ -45,13 +45,33 @@ Le projet utilise **react-router-dom** (routing minimal).
 
 ---
 
+## 🎨 Thème sombre (test rapide)
+
+Le thème sombre est activé par l’attribut `data-theme` sur la balise `<html>`.  
+Dans votre navigateur, ouvrez la **console** (F12) et exécutez :
+
+```js
+// activer
+document.documentElement.setAttribute('data-theme', 'dark')
+
+// revenir au clair
+document.documentElement.setAttribute('data-theme', 'light')
+
+// ou carrément supprimer l’attribut
+document.documentElement.removeAttribute('data-theme')
+```
+
+> Astuce : le projet charge `styles/themes/dark.css`. Pour un toggle persistant, vous pouvez stocker le choix dans `localStorage`.
+
+---
+
 ## 📂 Structure du projet
 
 ```
 opale-front/
- ├─ public/                 # ressources publiques
+ ├─ public/                       # ressources publiques
  ├─ src/
- │   ├─ assets/             # images/icônes
+ │   ├─ assets/                   # images/icônes
  │   ├─ components/
  │   │   ├─ Checklist.jsx
  │   │   └─ Sidebar.jsx
@@ -59,10 +79,17 @@ opale-front/
  │   │   ├─ PlanningMacro.jsx
  │   │   ├─ Promotions.jsx
  │   │   └─ Placeholder.jsx
- │   ├─ App.jsx             # layout + <Routes/>
- │   ├─ main.jsx            # point d’entrée + <BrowserRouter/>
- │   └─ App.css           # styles globaux (tokens + layout)
- │   └─ index.css           # styles globaux (tokens + layout)
+ │   ├─ styles/                   # styles organisés par couches
+ │   │   ├─ token.css
+ │   │   ├─ base.css
+ │   │   ├─ layout.css
+ │   │   ├─ components.css
+ │   │   ├─ pages.css
+ │   │   ├─ utilities.css
+ │   │   └─ themes/
+ │   │       └─ dark.css
+ │   ├─ App.jsx                   # layout + <Routes/>
+ │   └─ main.jsx                  # point d’entrée + imports CSS
  ├─ package.json
  ├─ package-lock.json
  ├─ vite.config.js
@@ -70,7 +97,7 @@ opale-front/
  └─ README.md
 ```
 
-> ℹ️ `App.css` provient du template Vite et **n’est pas utilisé**. Vous pouvez le supprimer si souhaité.
+> ℹ️ Les anciens `App.css` / `index.css` du template Vite ne sont plus utilisés.
 
 ---
 
@@ -80,8 +107,9 @@ opale-front/
 - **Routing minimal** (planning, promotions, placeholders)
 - **Génération planning macro** : checklist interactive + `console.log()` sur action
 - **Gestion des promotions** : cycles + promotions (ajout/suppression/renommage en mémoire)
-- **Bouton de déconnexion** (simulé via `console.log`)
+- **Boutons plats** (primary/tertiary/danger) + **bouton déconnexion** fusionné à sa carte
 - **Responsive** desktop → mobile
+- **Mode sombre prêt** (variables CSS + thème `dark`)
 
 ---
 
@@ -106,19 +134,19 @@ opale-front/
 ## 🧑‍💻 Conventions Git & Versioning
 
 - **Branches**
-    - `main` : stable
-    - `feat/*`, `fix/*`, `chore/*` : travail au quotidien
+  - `master` : stable
+  - `feat/*`, `fix/*`, `chore/*` : travail au quotidien
 - **Commits** : format *Conventional Commits*
-    - `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `style:`, `test:`, `build:`, `ci:`
-    - Ex : `feat(routing): set up minimal routing with react-router-dom`
+  - `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `style:`, `test:`, `build:`, `ci:`
+  - Ex : `feat(routing): set up minimal routing with react-router-dom`
 - **Versioning** : SemVer
-    - **MAJOR**: rupture (2.0.0)
-    - **MINOR**: nouvelle fonctionnalité rétrocompatible (1.2.0)
-    - **PATCH**: correctifs/ajustements (1.1.4)
-    - **Série 1.1.x** : stabilisation des bases (mise en place d’éléments simples, style, 2 vues, bonnes pratiques).
-
+  - **MAJOR**: rupture (2.0.0)
+  - **MINOR**: nouvelle fonctionnalité rétrocompatible (1.2.0)
+  - **PATCH**: correctifs/ajustements (1.1.x)
+  - **Série 1.1.x** : stabilisation des bases (mise en place d’éléments simples, style, 2 vues, bonnes pratiques).
 - **Tag de release**
-    - Exemple : `v1.1.3` — *mise en place du routing minimal*
+  - Exemple : `v1.1.3` — *mise en place du routing minimal*
+  - Exemple : `v1.1.4` — *réorganisation CSS + boutons plats + thème sombre prêt*
 
 ---
 
