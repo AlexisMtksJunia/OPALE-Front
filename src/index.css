@@ -311,3 +311,18 @@ body {
   object-fit: contain; opacity: .9;
 }
 .add-cycle-card:hover { background: #f1f5f9; transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+
+/* NavLink: enlever l'aspect lien (soulignement/couleur par défaut) */
+.nav .nav-btn,
+.nav .nav-btn:visited,
+.nav .nav-btn:hover,
+.nav .nav-btn:focus,
+.nav .nav-btn:active,
+.nav-btn-footer,
+.nav-btn-footer:visited,
+.nav-btn-footer:hover,
+.nav-btn-footer:focus,
+.nav-btn-footer:active {
+  text-decoration: none;   /* pas de soulignement */
+  color: inherit;          /* hérite de la couleur du texte */
+}
