@@ -56,5 +56,9 @@
     /* Breakpoints (utilisables dans les @media) */
     --bp-md: 860px;
     --bp-sm: 620px;
+
+    /* Tokens spécifiques "Add cycle" */
+    --add-cycle-border-width: 3px;
+    --add-cycle-border-color: #4F4F4F88;
   }
 }

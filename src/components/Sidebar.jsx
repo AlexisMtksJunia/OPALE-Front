@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import logoFull from '../assets/logo-full.png'
@@ -7,7 +8,8 @@ import icPromotions from '../assets/ic-promos.png'
 import icEvenements from '../assets/ic-events.png'
 import icEnseignants from '../assets/ic-profs.png'
 import icSalles from '../assets/ic-salles.png'
-import icPara from '../assets/ic-para.png'
+import icLogout from '../assets/ic-logout.png'
+import icContact from '../assets/ic-contact.png'
 
 const items = [
     { to: '/planning',   label: 'Planning',    ic: icPlanning },
@@ -18,6 +20,16 @@ const items = [
 ]
 
 export default function Sidebar() {
+    const handleDisconnect = () => {
+        console.log('[AUTH] Se déconnecter')
+        // plus tard : appel API + redirection login
+    }
+
+    const handleContact = () => {
+        console.log('[AUTH] Page contact')
+        // plus tard : appel API + redirection login
+    }
+
     return (
         <aside className="card sidebar">
             <div className="brand">
@@ -30,24 +42,37 @@ export default function Sidebar() {
                     <NavLink
                         key={it.to}
                         to={it.to}
-                        className={({ isActive }) => `nav-btn ${isActive ? 'active' : ''}`}
+                        className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}
                         onClick={() => console.log(`[NAV] ${it.label}`)}
                     >
                         <span className="nav-label">{it.label}</span>
-                        <img className="nav-icon-right" src={it.ic} alt="" />
+                        <img className="nav-icon-right" src={it.ic} alt=""/>
                     </NavLink>
                 ))}
             </nav>
 
             <div className="sidebar-footer">
-                <NavLink
-                    to="/parametres"
-                    className={({ isActive }) => `nav-btn-footer ${isActive ? 'active' : ''}`}
-                    onClick={() => console.log('[NAV] Paramètres')}
-                >
-                    <img className="nav-icon-left" src={icPara} alt="" />
-                    <span className="nav-label">Paramètres</span>
-                </NavLink>
+                <div className="footer-actions">
+                    <button
+                        type="button"
+                        className="footer-icon-btn"
+                        onClick={handleDisconnect}
+                        aria-label="Se déconnecter"
+                        title="Se déconnecter"
+                    >
+                        <img src={icLogout} alt=""/>
+                    </button>
+
+                    <button
+                        type="button"
+                        className="footer-icon-btn"
+                        onClick={handleContact}
+                        aria-label="Contact"
+                        title="Contact"
+                    >
+                        <img src={icContact} alt=""/>
+                    </button>
+                </div>
             </div>
         </aside>
     )

@@ -17,13 +17,6 @@ function AppLayout() {
 
             {/* Colonne droite */}
             <div className="right-col">
-                <div className="disconnect-card card">
-                    <button className="btn-disconnect" onClick={handleDisconnect}>
-                        <span>Se déconnecter</span>
-                        <img src={userIcon} alt="" />
-                    </button>
-                </div>
-
                 <main className="card main-card">
                     <div className="main-inner">
                         <Outlet />

@@ -3,7 +3,7 @@
 @layer tokens {
   :root[data-theme="dark"] {
     --bg: radial-gradient(circle at 30% 0%, #0f1115, #0d1117 40%, #0b0f14 60%, #090d12 100%);
-    --panel: #161a21;
+    --panel: #2a3442;
     --panel-soft: #1b2029;
     --text: #e5e7eb;
     --muted: #9aa3af;
@@ -25,14 +25,11 @@
     --shadow-sm: 0 2px 6px rgba(0,0,0,.4);
     --shadow-md: 0 4px 12px rgba(0,0,0,.45);
     --shadow-lg: 0 8px 24px rgba(0,0,0,.5);
+
+    /* Bordure "Add cycle" en thème sombre */
+    --add-cycle-border-width: 3px;
+    --add-cycle-border-color: #F9F9F9;
   }
 }
 
-/* Ajustements page (si tu veux garder un look un peu différent pour cette carte) */
-@layer pages {
-  .add-cycle-card {
-    background: #11161d;
-    border-color: #2a3442;
-  }
-  .add-cycle-card:hover { background: #0f141b; }
-}
+
