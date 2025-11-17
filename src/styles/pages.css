@@ -132,3 +132,293 @@
     box-shadow: var(--shadow-lg);
   }
 }
+
+/* ========== Édition de promotion (overlay) ========== */
+
+.promo-edit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45); /* sombre, semi-transparent */
+}
+
+.promo-edit-card {
+  width: min(840px, 96vw);
+  padding: 20px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.promo-edit-title {
+  margin: 0 0 4px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.promo-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.promo-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.promo-edit-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.promo-edit-input {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.promo-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (max-width: 620px) {
+  .promo-edit-card {
+    width: 94vw;
+    padding: 16px 14px 12px;
+  }
+}
+
+/* Layout global de la card d'édition */
+.promo-edit-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1.2fr; /* infos principales + colonne droite */
+  gap: 16px;
+}
+
+/* Colonne droite (Groupes + Spécialités) */
+.promo-edit-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Sections de la card */
+.promo-section {
+  background: var(--panel-soft);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.promo-section-title {
+  margin: 0 0 4px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.promo-section-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.promo-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.promo-edit-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.promo-edit-input {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+/* Listes groupes/spécialités */
+.promo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.promo-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+/* Mobile */
+@media (max-width: 860px) {
+  .promo-edit-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .promo-edit-card {
+    width: 94vw;
+  }
+}
+
+/* Ligne groupe/spécialité : nom + nb étudiants */
+.promo-list-main {
+  display: grid;
+  grid-template-columns: 2fr 0.7fr;  /* nom plus large */
+  gap: 10px;                         /* meilleure respiration */
+  align-items: center;
+}
+
+/* Input du nom */
+.promo-list-name {
+  width: 100%;
+  min-width: 0;                      /* évite l’overflow */
+  font-size: 15px;
+}
+
+/* Input du nombre d'étudiants */
+.promo-list-count {
+  width: 100%;
+  min-width: 60px;                   /* plus confortable */
+  max-width: 100px;                  /* évite trop grand */
+  text-align: center;
+  font-size: 15px;
+}
+
+/* ========== Pop-up d'ajustement auto des effectifs ========== */
+
+.promo-adjust-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* au-dessus de la card d'édition */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.promo-adjust-card {
+  width: min(420px, 94vw);
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.promo-adjust-title {
+  margin: 0 0 4px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.promo-adjust-text {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.promo-adjust-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.promo-adjust-label {
+  font-size: 15px;
+}
+
+/* Bouton "radio" custom */
+.radio-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.radio-toggle-input {
+  display: none;
+}
+
+.radio-toggle-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid var(--muted);   /* 👈 couleur visible */
+  background: rgba(255, 255, 255, 0.06); /* 👈 léger fond pour que le cercle existe */
+  display: inline-block;
+  transition: background .2s, border-color .2s;
+}
+
+.radio-toggle-input:checked + .radio-toggle-dot {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.promo-adjust-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* Avertissements de cohérence des effectifs */
+.promo-mismatch-block {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.promo-mismatch {
+  margin: 0;
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  color: #b91c1c; /* rouge bien visible */
+}
+
+/* Ligne principale d'une promotion : nom + warning */
+.promo-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Icône warning sur la ligne de promo */
+.promo-warning {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}

@@ -88,6 +88,19 @@
     cursor: pointer;
     text-align: left;
   }
+  .cl-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cl-warning {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
   .badge {
     width: 28px; height: 28px; border-radius: 8px;
     display: inline-flex; align-items: center; justify-content: center;

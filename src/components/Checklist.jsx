@@ -1,9 +1,6 @@
 import React from 'react'
+import icWarning from '../assets/ic-warning.png'
 
-/**
- * Pastille gauche = checkbox cliquable
- * Couleur contrôlée par 'status': 'ok' (turquoise) | 'alert' (jaune)
- */
 export default function Checklist({ items, onToggle }) {
     return (
         <div className="checklist">
@@ -16,13 +13,23 @@ export default function Checklist({ items, onToggle }) {
                         onToggle?.(idx, !it.checked)
                     }}
                 >
-          <span
-              className={`badge ${it.status === 'ok' ? 'ok' : 'alert'} ${it.checked ? 'checked' : ''}`}
-              aria-hidden
-          >
-            {it.checked ? '✓' : ''}
-          </span>
-                    <span className="cl-label">{it.label}</span>
+                    <span
+                        className={`badge ${it.status === 'ok' ? 'ok' : 'alert'} ${it.checked ? 'checked' : ''}`}
+                        aria-hidden
+                    >
+                        {it.checked ? '✓' : ''}
+                    </span>
+
+                    <span className="cl-label-wrap">
+                        <span className="cl-label">{it.label}</span>
+                        {it.warning && (
+                            <img
+                                src={icWarning}
+                                alt="Alerte sur cet élément"
+                                className="cl-warning"
+                            />
+                        )}
+                    </span>
                 </button>
             ))}
         </div>
