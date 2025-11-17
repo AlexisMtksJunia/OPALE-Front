@@ -10,6 +10,7 @@ import icEnseignants from '../assets/ic-profs.png'
 import icSalles from '../assets/ic-salles.png'
 import icLogout from '../assets/ic-logout.png'
 import icContact from '../assets/ic-contact.png'
+import ThemeToggle from './ThemeToggle.jsx'
 
 const items = [
     { to: '/planning',   label: 'Planning',    ic: icPlanning },
@@ -35,6 +36,10 @@ export default function Sidebar() {
             <div className="brand">
                 <img className="logo-full" src={logoFull} alt="OPALE"/>
                 <img className="logo-compact" src={logoCompact} alt="O"/>
+            </div>
+
+            <div className="theme-toggle-wrapper">
+                <ThemeToggle/>
             </div>
 
             <nav className="nav">
