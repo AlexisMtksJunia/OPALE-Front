@@ -167,3 +167,7 @@ Si besoin, ajoutez un `src/mocks/` pour centraliser des données de démo et gar
 ---
 
 💡 Projet développé dans le cadre d’AP5 à Junia.
+cd "C:\Users\Alexis Mtks\Documents\Anais"
+mkdir elan
+cd elan
+npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
