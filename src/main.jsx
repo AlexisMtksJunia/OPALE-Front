@@ -7,7 +7,7 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/layout.css'
 import './styles/components.css'
-import './styles/pages.css'
+import './styles/pages/promotions/index.css'
 import './styles/utilities.css'
 import './styles/themes/dark.css'
 

@@ -1,4 +1,4 @@
-# OPALE Front
+# OPALE Front (v1.1.6)
 
 Interface web du projet **OPALE**, développée en **React** avec **Vite**.  
 Objectif : piloter la génération d’un planning **macro** annuel et des vues **micro** par promotion.
@@ -33,8 +33,7 @@ Par défaut, l’application est accessible sur **http://localhost:5173**.
 
 ---
 
-## 🧭 Routing (v1.1.3)
-
+## 🧭 Routing
 Le projet utilise **react-router-dom** (routing minimal).
 
 - `/planning` — Génération du planning **macro** (checklist + CTA)
@@ -84,8 +83,14 @@ opale-front/
  │   │   ├─ base.css
  │   │   ├─ layout.css
  │   │   ├─ components.css
- │   │   ├─ pages.css
- │   │   ├─ utilities.css
+ │   │   ├─ pages/
+ │   │   │   └─ promotions/
+ │   │   │        ├─ _layout.css
+ │   │   │        ├─ _promo-row.css
+ │   │   │        ├─ _edit-modal.css
+ │   │   │        ├─ _lists.css
+ │   │   │        ├─ _adjust-popup.css
+ │   │   │        └─ index.css
  │   │   └─ themes/
  │   │       └─ dark.css
  │   ├─ App.jsx                   # layout + <Routes/>
@@ -110,6 +115,7 @@ opale-front/
 - **Boutons plats** (primary/tertiary/danger) + **bouton déconnexion** fusionné à sa carte
 - **Responsive** desktop → mobile
 - **Mode sombre prêt** (variables CSS + thème `dark`)
+- **CSS modulaire**
 
 ---
 
@@ -167,7 +173,3 @@ Si besoin, ajoutez un `src/mocks/` pour centraliser des données de démo et gar
 ---
 
 💡 Projet développé dans le cadre d’AP5 à Junia.
-cd "C:\Users\Alexis Mtks\Documents\Anais"
-mkdir elan
-cd elan
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
