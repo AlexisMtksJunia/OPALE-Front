@@ -4,7 +4,6 @@ import Sidebar from './components/Sidebar.jsx'
 import Promotions from './pages/Promotions.jsx'
 import PlanningMacro from './pages/PlanningMacro.jsx'
 import Placeholder from './pages/Placeholder.jsx'
-import userIcon from './assets/ic-user.png'
 
 function AppLayout() {
     const handleDisconnect = () => {

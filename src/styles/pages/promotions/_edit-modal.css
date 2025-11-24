@@ -205,7 +205,7 @@
     }
 
     .constraint-pill {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         gap: 6px;
         border-radius: 999px;
