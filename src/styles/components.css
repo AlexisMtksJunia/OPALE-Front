@@ -22,11 +22,11 @@
     background: var(--primary);
     border: 1px solid transparent;         /* pour une géométrie stable */
     color: #0b3b24;
-    padding: 14px 20px;
+    padding: 8px 16px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
-    font-size: clamp(16px, 2vw, 26px);
+    font-size: clamp(16px, 2vw, 18px);
     font-weight: 600;
     box-shadow: none;                       /* ✅ pas d'ombre */
     transition: background .2s;

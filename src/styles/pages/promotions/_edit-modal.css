@@ -11,7 +11,7 @@
     }
 
     .promo-edit-card {
-        width: min(840px, 96vw);
+        width: min(1280px, 96vw);
         padding: 20px 20px 16px;
         display: flex;
         flex-direction: column;
@@ -25,21 +25,24 @@
         font-weight: 700;
     }
 
-    /* Layout global de la card d'édition */
+    /* Layout global de la card d'édition :
+       - Colonne 1 : informations principales
+       - Colonne 2 : groupes / spécialités
+       - Colonne 3 : contraintes académiques
+    */
     .promo-edit-layout {
         display: grid;
-        grid-template-columns: 1.6fr 1.2fr; /* infos principales + colonne droite */
+        grid-template-columns: 1.2fr 1.2fr 1.6fr;
         gap: 16px;
     }
 
-    /* Colonne droite (Groupes + Spécialités) */
     .promo-edit-side {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
 
-    /* Sections de la card */
+    /* Sections (les 3 colonnes utilisent le même conteneur visuel) */
     .promo-section {
         background: var(--panel-soft);
         border-radius: var(--radius);
@@ -47,6 +50,7 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
+        box-shadow: var(--shadow-md);
     }
 
     .promo-section-title {
@@ -106,12 +110,165 @@
         color: #b91c1c; /* rouge bien visible */
     }
 
-    /* Mobile */
+    /* ===== Colonne "Contraintes académiques" ===== */
+
+    .promo-section-constraints {
+        background: var(--panel-soft);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .promo-section-constraints .promo-section-title {
+        margin-bottom: 8px;
+    }
+
+    .constraints-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 14px;
+    }
+
+    .constraint-card {
+        border-radius: 24px;
+        padding: 14px 16px;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 10px;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: #111827;
+    }
+
+    .constraint-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    /* Titre dans chaque card contrainte */
+    .constraint-title {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    /* Bouton + circulaire sous le titre */
+    .constraint-add-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        /*border: 1.5px solid var(--brand);*/
+        border: 1.5px solid;
+        background: transparent;
+        /*color: var(--brand);*/
+        font-size: 18px;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .constraint-add-btn:hover {
+        background: rgba(50, 50, 50, 0.2); /* léger halo, tu peux ajuster */
+    }
+
+    /* Vacances = sur toute la ligne */
+    .constraint-vacances {
+        grid-column: 1 / -1;
+        background: #FFF8D5CC;
+    }
+
+    .constraint-stages         { background: #F0EAFECC; }
+    .constraint-international  { background: #DAFBF9CC; }
+    .constraint-partiels       { background: #FFE6EECC; }
+    .constraint-rattrapages    { background: #DDF6E5CC; }
+
+    .constraint-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .constraint-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 4px 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .constraint-pill-main {
+        border: none;
+        background: transparent;
+        padding: 2px 4px;
+        cursor: pointer;
+        font: inherit;
+        text-align: left;
+    }
+
+    .constraint-pill-remove {
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        border: none;
+        background: rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .constraint-pill-remove:hover {
+        background: rgba(0, 0, 0, 0.16);
+    }
+
+    /* Couleurs des pastilles (ordre demandé) */
+    .constraint-pill-vacances {
+        background: #FAEDA8;
+    }
+
+    .constraint-pill-stages {
+        background: #D3CFFE;
+    }
+
+    .constraint-pill-international {
+        background: #ABEFEB;
+    }
+
+    .constraint-pill-partiels {
+        background: #FAC5D2;
+    }
+
+    .constraint-pill-rattrapages {
+        background: #AFE5BA;
+    }
+
+    /* Responsive */
     @media (max-width: 860px) {
-        .promo-edit-layout {
+        .constraints-grid {
             grid-template-columns: 1fr;
         }
+        .constraint-vacances {
+            grid-column: auto;
+        }
+    }
 
+    /* Responsive */
+    @media (max-width: 980px) {
         .promo-edit-card {
             width: 94vw;
         }

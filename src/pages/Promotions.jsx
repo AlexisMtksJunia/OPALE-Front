@@ -22,6 +22,14 @@ const DEFAULT = [
     { id: 'cycle-fisen', name: 'FISEN', years: 3 },
 ]
 
+const createEmptyConstraints = () => ({
+    vacances: [],
+    stages: [],
+    international: [],
+    partiels: [],
+    rattrapages: [],
+})
+
 export default function Promotions() {
     const [cycles, setCycles] = useState(() =>
         DEFAULT.map(c => ({
@@ -117,6 +125,10 @@ export default function Promotions() {
             endDate: promo.endDate || '',
             groups: normalizeList(promo.groups, 'grp'),
             specialties: normalizeList(promo.specialties, 'spec'),
+            constraints: {
+                ...createEmptyConstraints(),
+                ...(promo.constraints || {}),
+            },
         })
 
         setLastStudentsPrompt(promo.students ?? 0)
@@ -148,6 +160,7 @@ export default function Promotions() {
                             endDate: editingPromo.endDate,
                             groups: editingPromo.groups || [],
                             specialties: editingPromo.specialties || [],
+                            constraints: editingPromo.constraints || createEmptyConstraints(),
                         }
                         console.log('[PROMO] updated', updated)
                         return updated
@@ -254,6 +267,64 @@ export default function Promotions() {
             open: true,
             groups: false,
             specialties: false,
+        })
+    }
+
+    const handleAddConstraint = (type) => {
+        setEditingPromo(prev => {
+            if (!prev) return prev
+            const base = prev.constraints || createEmptyConstraints()
+            const list = base[type] || []
+
+            const newRange = {
+                id: uid(`ctr-${type}`),
+                startDate: '',
+                endDate: '',
+            }
+
+            return {
+                ...prev,
+                constraints: {
+                    ...base,
+                    [type]: [...list, newRange],
+                },
+            }
+        })
+    }
+
+    const handleRemoveConstraint = (type, id) => {
+        setEditingPromo(prev => {
+            if (!prev) return prev
+            const base = prev.constraints || createEmptyConstraints()
+            const list = base[type] || []
+
+            return {
+                ...prev,
+                constraints: {
+                    ...base,
+                    [type]: list.filter(r => r.id !== id),
+                },
+            }
+        })
+    }
+
+    const handleUpdateConstraintRange = (type, id, field, value) => {
+        setEditingPromo(prev => {
+            if (!prev) return prev
+            const prevConstraints = prev.constraints || {}
+            const ranges = prevConstraints[type] || []
+
+            const updatedRanges = ranges.map(r =>
+                r.id === id ? { ...r, [field]: value } : r
+            )
+
+            return {
+                ...prev,
+                constraints: {
+                    ...prevConstraints,
+                    [type]: updatedRanges,
+                },
+            }
         })
     }
 
@@ -434,6 +505,10 @@ export default function Promotions() {
                     onAddSpecialty={addSpecialty}
                     onRemoveSpecialty={removeSpecialty}
                     onStudentsBlur={handleStudentsBlur}
+                    constraints={editingPromo.constraints}
+                    onAddConstraint={handleAddConstraint}
+                    onRemoveConstraint={handleRemoveConstraint}
+                    onUpdateConstraintRange={handleUpdateConstraintRange}
                 />
             )}
 
