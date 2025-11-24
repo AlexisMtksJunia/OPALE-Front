@@ -27,6 +27,8 @@ export default function PromoEditDialog({
         specialtiesMismatch,
     } = computePromoTotals(editingPromo)
 
+    const isApPromo = (name) => /^AP/i.test(name || "");
+
     if (!editingPromo) return null
 
     const [editingRange, setEditingRange] = useState(null) // { type, id } ou null
@@ -228,85 +230,75 @@ export default function PromoEditDialog({
                         <h4 className="promo-section-title">Contraintes académiques</h4>
 
                         <div className="constraints-grid">
-                            {/* Vacances */}
-                            <div className="constraint-card constraint-vacances">
+                            {/* Bloc Vacances / Entreprise */}
+                            <div className={
+                                "constraint-card " + (isApPromo(editingPromo.name)
+                                    ? "constraint-entreprise"
+                                    : "constraint-vacances")
+                            }>
                                 <div className="constraint-card-header">
-                                    <span className="constraint-title">Vacances</span>
+        <span className="constraint-title">
+            {isApPromo(editingPromo.name) ? "Entreprise" : "Vacances"}
+        </span>
+
                                     <button
                                         type="button"
                                         className="constraint-add-btn"
-                                        onClick={() => onAddConstraint && onAddConstraint('vacances')}
-                                        aria-label="Ajouter une contrainte Vacances"
+                                        onClick={() =>
+                                            onAddConstraint &&
+                                            onAddConstraint(isApPromo(editingPromo.name) ? 'entreprise' : 'vacances')
+                                        }
+                                        aria-label="Ajouter une contrainte"
                                     >
                                         +
                                     </button>
                                 </div>
 
                                 <div className="constraint-tags">
-                                    {getRanges('vacances').map((range) => {
+                                    {getRanges(isApPromo(editingPromo.name) ? "entreprise" : "vacances").map((range) => {
+                                        const type = isApPromo(editingPromo.name) ? "entreprise" : "vacances";
                                         const isEditing =
                                             editingRange &&
-                                            editingRange.type === 'vacances' &&
-                                            editingRange.id === range.id
+                                            editingRange.type === type &&
+                                            editingRange.id === range.id;
 
                                         return (
-                                            <div
+                                            <button
+                                                type="button"
                                                 key={range.id}
-                                                className="constraint-pill constraint-pill-vacances"
+                                                className={
+                                                    "constraint-pill " +
+                                                    (isApPromo(editingPromo.name)
+                                                        ? "constraint-pill-entreprise"
+                                                        : "constraint-pill-vacances")
+                                                }
+                                                onClick={() => handleRangeClick(type, range.id)}
                                             >
-                                                <button
-                                                    type="button"
-                                                    className="constraint-pill-main"
-                                                    onClick={() => handleRangeClick('vacances', range.id)}
-                                                >
-                                                    {isEditing ? (
-                                                        <div className="constraint-pill-editor">
-                                                            <input
-                                                                type="date"
-                                                                className="constraint-date-input"
-                                                                value={range.start || ''}
-                                                                onChange={(e) =>
-                                                                    handleRangeDateChange(
-                                                                        'vacances',
-                                                                        range.id,
-                                                                        'start',
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                            />
-                                                            <span className="constraint-date-separator">-</span>
-                                                            <input
-                                                                type="date"
-                                                                className="constraint-date-input"
-                                                                value={range.end || ''}
-                                                                onChange={(e) =>
-                                                                    handleRangeDateChange(
-                                                                        'vacances',
-                                                                        range.id,
-                                                                        'end',
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        formatRangeLabel(range)
-                                                    )}
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    className="constraint-pill-remove"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleRemoveRange('vacances', range.id)
-                                                    }}
-                                                    aria-label="Supprimer cette plage Vacances"
-                                                >
-                                                    −
-                                                </button>
-                                            </div>
-                                        )
+                                                {isEditing ? (
+                                                    <div className="constraint-pill-editor">
+                                                        <input
+                                                            type="date"
+                                                            className="constraint-date-input"
+                                                            value={range.start || ""}
+                                                            onChange={(e) =>
+                                                                handleRangeDateChange(type, range.id, "start", e.target.value)
+                                                            }
+                                                        />
+                                                        <span className="constraint-date-separator">-</span>
+                                                        <input
+                                                            type="date"
+                                                            className="constraint-date-input"
+                                                            value={range.end || ""}
+                                                            onChange={(e) =>
+                                                                handleRangeDateChange(type, range.id, "end", e.target.value)
+                                                            }
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    formatRangeLabel(range)
+                                                )}
+                                            </button>
+                                        );
                                     })}
                                 </div>
                             </div>

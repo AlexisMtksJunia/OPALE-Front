@@ -24,6 +24,7 @@ const DEFAULT = [
 
 const createEmptyConstraints = () => ({
     vacances: [],
+    entreprise: [],
     stages: [],
     international: [],
     partiels: [],

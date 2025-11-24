@@ -188,6 +188,11 @@
         background: #FFF8D5CC;
     }
 
+    .constraint-entreprise {
+        grid-column: 1 / -1;
+        background: #E8F2FFCC; /* bleu léger business */
+    }
+
     .constraint-stages         { background: #F0EAFECC; }
     .constraint-international  { background: #DAFBF9CC; }
     .constraint-partiels       { background: #FFE6EECC; }
@@ -239,6 +244,10 @@
     /* Couleurs des pastilles (ordre demandé) */
     .constraint-pill-vacances {
         background: #FAEDA8;
+    }
+
+    .constraint-pill-entreprise {
+        background: #C5DFFF; /* bleu pastel */
     }
 
     .constraint-pill-stages {
