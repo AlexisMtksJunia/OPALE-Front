@@ -4,11 +4,13 @@ import Sidebar from './components/Sidebar.jsx'
 import Promotions from './pages/Promotions.jsx'
 import PlanningMacro from './pages/PlanningMacro.jsx'
 import Placeholder from './pages/Placeholder.jsx'
+import Login from './pages/Login';  // Utilisation correcte du chemin
+import { useTheme } from './hooks/useTheme.js';
 
 function AppLayout() {
     const handleDisconnect = () => {
-        console.log('[AUTH] Se déconnecter')
-    }
+        console.log('[AUTH] Se déconnecter');
+    };
 
     return (
         <div className="app">
@@ -23,24 +25,27 @@ function AppLayout() {
                 </main>
             </div>
         </div>
-    )
+    );
 }
 
 export default function App() {
+    const { theme } = useTheme();
+
     return (
-
-        <Routes>
-            <Route element={<AppLayout />}>
-
-                <Route path="/" element={<Navigate to="/planning" replace />} />
-                <Route path="/planning" element={<PlanningMacro />} />
-                <Route path="/promotions" element={<Promotions />} />
-                <Route path="/evenements" element={<Placeholder title="Événements" />} />
-                <Route path="/enseignants" element={<Placeholder title="Enseignants" />} />
-                <Route path="/salles" element={<Placeholder title="Salles" />} />
-                <Route path="/parametres" element={<Placeholder title="Paramètres" />} />
-                <Route path="*" element={<Placeholder title="Page introuvable" notFound />} />
-            </Route>
-        </Routes>
-    )
+        <div className={theme}>
+            <Routes>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route element={<AppLayout />}>
+                    <Route path="/planning" element={<PlanningMacro />} />
+                    <Route path="/promotions" element={<Promotions />} />
+                    <Route path="/evenements" element={<Placeholder title="Événements" />} />
+                    <Route path="/enseignants" element={<Placeholder title="Enseignants" />} />
+                    <Route path="/salles" element={<Placeholder title="Salles" />} />
+                    <Route path="/parametres" element={<Placeholder title="Paramètres" />} />
+                    <Route path="*" element={<Placeholder title="Page introuvable" notFound />} />
+                </Route>
+            </Routes>
+        </div>
+    );
 }
