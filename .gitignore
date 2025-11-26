@@ -63,3 +63,5 @@ coverage/
 # TypeScript (si utilisé plus tard)
 # ======================
 *.tsbuildinfo
+
+*.zip
