@@ -1,33 +1,15 @@
 // src/hooks/promotions/usePromotionCycles.ts
 import { useState, useEffect } from 'react'
 import { Cycle, Promotion } from '../../models'
+import { buildMockCycles } from '../../mocks/promotionCycles.mock'
 import {
     uid,
     makePromotions,
     hasPromoMismatch,
 } from '../../utils/promoUtils'
 
-interface DefaultCycle {
-    id: string
-    name: string
-    years: number
-}
-
-const DEFAULT: DefaultCycle[] = [
-    { id: 'cycle-adi',   name: 'ADI',   years: 2 },
-    { id: 'cycle-sir',   name: 'SIR',   years: 2 },
-    { id: 'cycle-isen',  name: 'ISEN',  years: 3 },
-    { id: 'cycle-fisen', name: 'FISEN', years: 3 },
-]
-
 export function usePromotionCycles() {
-    const [cycles, setCycles] = useState<Cycle[]>(() =>
-        DEFAULT.map(c => ({
-            id: c.id,
-            name: c.name,
-            promotions: makePromotions(c.name, c.years),
-        }))
-    )
+    const [cycles, setCycles] = useState<Cycle[]>(() => buildMockCycles())
 
     // Ajout d’un cycle
     const addCycle = (): void => {
