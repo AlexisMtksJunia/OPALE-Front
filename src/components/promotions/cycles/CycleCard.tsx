@@ -1,3 +1,4 @@
+// src/components/promotions/cycles/CycleCard.tsx
 import React from 'react'
 import icMoins from '../../../assets/ic-moins.png'
 import icWarning from '../../../assets/ic-warning.png'

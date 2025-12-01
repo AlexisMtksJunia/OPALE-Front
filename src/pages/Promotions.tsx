@@ -1,4 +1,4 @@
-// src/pages/Promotions.jsx
+// src/pages/Promotions.tsx
 import React from 'react'
 import icPlus from '../assets/ic-plus.png'
 
