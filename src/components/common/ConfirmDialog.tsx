@@ -9,71 +9,84 @@ interface ConfirmDialogProps {
     cancelLabel?: string
     onConfirm: () => void
     onCancel: () => void
-
-    // classes de boutons optionnelles
     confirmClassName?: string
     cancelClassName?: string
 
-    // optionnel : pour “fermer seulement le popup” (ESC, croix, overlay)
+    // Appelé quand on veut simplement fermer le popup
+    // (ESC, clic overlay, croix) sans déclencher confirm/cancel métier
     onRequestClose?: () => void
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
-                                                         open,
-                                                         title = 'Confirmer les modifications',
-                                                         message,
-                                                         confirmLabel = 'Confirmer',
-                                                         cancelLabel = 'Annuler',
-                                                         onConfirm,
-                                                         onCancel,
-                                                         confirmClassName = 'btn-primary',
-                                                         cancelClassName = 'btn-tertiary',
-                                                         onRequestClose,
-                                                     }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = (props) => {
+    const {
+        open,
+        title = 'Confirmer',
+        message,
+        confirmLabel = 'OK',
+        cancelLabel = 'Annuler',
+        onConfirm,
+        onCancel,
+        confirmClassName = 'btn-primary',
+        cancelClassName = 'btn-tertiary',
+        onRequestClose,
+    } = props
+
+    // Gestion de ESC au niveau du popup
+    useEffect(() => {
+        if (!open) return
+
+        const handleKey = (e: KeyboardEvent) => {
+
+            if (e.key === 'Escape') {
+                // On bloque la propagation vers les autres listeners (card, page, etc.)
+                e.stopPropagation()
+                e.preventDefault()
+
+                if (onRequestClose) {
+                    onRequestClose()
+                } else {
+                    onCancel()
+                }
+            }
+        }
+
+        // ⚠️ capture = true → on intercepte avant les autres keydown
+        window.addEventListener('keydown', handleKey, true)
+
+        return () => {
+            window.removeEventListener('keydown', handleKey, true)
+        }
+    }, [open, onRequestClose, onCancel])
+
     if (!open) return null
 
-    // 👇 centralise la logique de “fermeture passive”
-    const handleRequestClose = () => {
+    const handleOverlayClick = () => {
         if (onRequestClose) {
             onRequestClose()
         } else {
-            // fallback : se comporte comme le bouton "Annuler"
             onCancel()
         }
     }
 
-    // ESC → ferme seulement le popup (pas la card)
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return
-            event.stopPropagation()
-            handleRequestClose()
+    const handleCloseButton = () => {
+        if (onRequestClose) {
+            onRequestClose()
+        } else {
+            onCancel()
         }
-
-        window.addEventListener('keydown', handleKeyDown)
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [onRequestClose, onCancel])
-
-    const handleOverlayClick = () => {
-        handleRequestClose()
-    }
-
-    const stopPropagation: React.MouseEventHandler<HTMLDivElement> = (e) => {
-        e.stopPropagation()
     }
 
     return (
         <div className="modal-overlay" onClick={handleOverlayClick}>
-            <div className="card confirm-dialog-card" onClick={stopPropagation}>
-                {/* ✕ en haut à droite */}
+            <div
+                className="card confirm-dialog-card"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Croix dans le popup */}
                 <button
                     type="button"
                     className="confirm-dialog-close"
-                    aria-label="Fermer la fenêtre"
-                    onClick={handleRequestClose}
+                    onClick={handleCloseButton}
                 >
                     ✕
                 </button>
@@ -88,14 +101,19 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                     <button
                         type="button"
                         className={cancelClassName}
-                        onClick={onCancel}
+                        onClick={() => {
+                            onCancel()
+                        }}
                     >
                         {cancelLabel}
                     </button>
+
                     <button
                         type="button"
                         className={confirmClassName}
-                        onClick={onConfirm}
+                        onClick={() => {
+                            onConfirm()
+                        }}
                     >
                         {confirmLabel}
                     </button>

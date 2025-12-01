@@ -1,5 +1,5 @@
 // src/components/common/ActionButtonsWithConfirm.tsx
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ConfirmDialog from './ConfirmDialog'
 
 interface ActionButtonsWithConfirmProps {
@@ -20,9 +20,6 @@ interface ActionButtonsWithConfirmProps {
 
     onSave: () => void
     onCancel: () => void
-
-    // 👇 nouveau : permet au parent de savoir si au moins un popup est ouvert
-    onPopupStateChange?: (isOpen: boolean) => void
 }
 
 const ActionButtonsWithConfirm: React.FC<ActionButtonsWithConfirmProps> = ({
@@ -43,19 +40,18 @@ const ActionButtonsWithConfirm: React.FC<ActionButtonsWithConfirmProps> = ({
                                                                                cancelDirtyDiscardLabel = 'Fermer sans enregistrer',
                                                                                onSave,
                                                                                onCancel,
-                                                                               onPopupStateChange,
                                                                            }) => {
     const [openSaveConfirm, setOpenSaveConfirm] = useState(false)
     const [openCancelConfirm, setOpenCancelConfirm] = useState(false)
 
-    // Informe le parent dès qu'un des deux popups change d'état
-    useEffect(() => {
-        onPopupStateChange?.(openSaveConfirm || openCancelConfirm)
-    }, [openSaveConfirm, openCancelConfirm, onPopupStateChange])
-
     /* -------- Bouton "Enregistrer" -------- */
-    const openSaveConfirmDialog = () => setOpenSaveConfirm(true)
-    const closeSaveConfirmDialog = () => setOpenSaveConfirm(false)
+    const openSaveConfirmDialog = () => {
+        setOpenSaveConfirm(true)
+    }
+
+    const closeSaveConfirmDialog = () => {
+        setOpenSaveConfirm(false)
+    }
 
     const handleConfirmSave = () => {
         closeSaveConfirmDialog()
@@ -68,10 +64,13 @@ const ActionButtonsWithConfirm: React.FC<ActionButtonsWithConfirmProps> = ({
             onCancel()
             return
         }
+
         setOpenCancelConfirm(true)
     }
 
-    const closeCancelConfirmDialog = () => setOpenCancelConfirm(false)
+    const closeCancelConfirmDialog = () => {
+        setOpenCancelConfirm(false)
+    }
 
     const handleConfirmCancelWithSave = () => {
         closeCancelConfirmDialog()
@@ -111,8 +110,11 @@ const ActionButtonsWithConfirm: React.FC<ActionButtonsWithConfirmProps> = ({
                 message={confirmMessage}
                 confirmLabel={confirmLabel}
                 cancelLabel={cancelLabel}
+                // classes par défaut : confirm = btn-primary, cancel = btn-tertiary
                 onConfirm={handleConfirmSave}
                 onCancel={closeSaveConfirmDialog}
+                // ESC / croix / overlay → ferment juste ce popup
+                onRequestClose={closeSaveConfirmDialog}
             />
 
             {/* Pop-up quand on clique sur "Annuler" avec des changements */}
@@ -122,10 +124,14 @@ const ActionButtonsWithConfirm: React.FC<ActionButtonsWithConfirmProps> = ({
                 message={cancelDirtyMessage}
                 confirmLabel={cancelDirtyConfirmLabel}
                 cancelLabel={cancelDirtyDiscardLabel}
+                // "Enregistrer et fermer" = bouton principal
                 confirmClassName="btn-primary"
+                // "Fermer sans enregistrer" = bouton rouge
                 cancelClassName="btn-danger"
                 onConfirm={handleConfirmCancelWithSave}
                 onCancel={handleDiscardChangesAndClose}
+                // ESC / croix / overlay → ferment SEULEMENT le popup
+                onRequestClose={closeCancelConfirmDialog}
             />
         </>
     )

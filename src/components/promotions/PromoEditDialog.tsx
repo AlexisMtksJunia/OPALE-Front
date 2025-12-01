@@ -40,7 +40,6 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
     const { editingPromo } = props
 
     const [openCloseConfirm, setOpenCloseConfirm] = useState(false)
-    const [hasButtonsPopupOpen, setHasButtonsPopupOpen] = useState(false)
 
     if (!editingPromo) return null
 
@@ -51,11 +50,11 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
     } as any)
 
     const handleSave = () => {
-        console.log('[PROMOS] Enregistrer les modifications')
         console.log('→ mettre à jour la BDD côté back')
         props.onSubmit()
     }
 
+    // Fermeture demandée par la croix / ESC (au niveau de la card)
     const handleRequestClose = () => {
         if (!props.hasChanges) {
             props.onClose()
@@ -79,24 +78,24 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
         setOpenCloseConfirm(false)
     }
 
-    // ESC → ferme la card seulement si aucun popup n'est ouvert
+    // ESC au niveau de la card : ne ferme la card QUE si aucun popup de confirmation n’est ouvert
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return
+        if (!editingPromo) return
 
-            // Si un popup (boutons) ou le popup de croix est ouvert, on ne ferme pas la card ici
-            if (openCloseConfirm || hasButtonsPopupOpen) {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape') return
+
+            const hasModal = document.querySelector('.modal-overlay')
+            if (hasModal) {
                 return
             }
 
-            props.onClose()
+            handleRequestClose()
         }
 
-        window.addEventListener('keydown', handleKeyDown)
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [openCloseConfirm, hasButtonsPopupOpen, props.onClose])
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [editingPromo, props.hasChanges]) // handleRequestClose est stable dans ce contexte
 
     return (
         <div className="promo-edit-overlay">
@@ -104,7 +103,7 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
                 className="card promo-edit-card"
                 onSubmit={(e) => e.preventDefault()}
             >
-                {/* ❌ croix en haut à droite */}
+                {/* Croix en haut à droite */}
                 <button
                     type="button"
                     className="promo-edit-close"
@@ -193,13 +192,11 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
                         }
                         cancelDirtyConfirmLabel="Enregistrer et fermer"
                         cancelDirtyDiscardLabel="Fermer sans enregistrer"
-                        // 👇 remonte l’état d’ouverture des popups liés aux boutons
-                        onPopupStateChange={setHasButtonsPopupOpen}
                     />
                 </div>
             </form>
 
-            {/* Popup spécifique pour la croix */}
+            {/* Popup spécifique pour la croix / ESC card */}
             <ConfirmDialog
                 open={openCloseConfirm}
                 title="Modifications non enregistrées"
@@ -215,6 +212,7 @@ const PromoEditDialog: React.FC<PromoEditDialogProps> = (props) => {
                 cancelClassName="btn-danger"
                 onConfirm={handleConfirmSaveAndClose}
                 onCancel={handleDiscardAndClose}
+                // ESC / croix / overlay → ferment juste ce popup
                 onRequestClose={handleCloseConfirmPopupOnly}
             />
         </div>

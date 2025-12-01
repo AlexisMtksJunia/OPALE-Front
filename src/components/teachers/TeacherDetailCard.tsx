@@ -33,7 +33,6 @@ export default function TeacherDetailCard({ teacher, onClose }: TeacherDetailCar
     } = useTeacherDetail(teacher)
 
     const [openCloseConfirm, setOpenCloseConfirm] = useState(false)
-    const [hasButtonsPopupOpen, setHasButtonsPopupOpen] = useState(false)
 
     const handleRequestClose = () => {
         if (!hasChanges) {
@@ -58,29 +57,27 @@ export default function TeacherDetailCard({ teacher, onClose }: TeacherDetailCar
         setOpenCloseConfirm(false)
     }
 
-    // ESC → ferme la card uniquement si aucun popup n'est ouvert
+    // ESC au niveau de la card : ne ferme la card QUE si aucun popup ConfirmDialog n’est ouvert
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape') return
 
-            if (openCloseConfirm || hasButtonsPopupOpen) {
-                // Il y a déjà un popup (boutons ou croix) ouvert → on laisse ConfirmDialog gérer
+            const hasModal = document.querySelector('.modal-overlay')
+            if (hasModal) {
                 return
             }
 
-            onClose()
+            handleRequestClose()
         }
 
-        window.addEventListener('keydown', handleKeyDown)
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [openCloseConfirm, hasButtonsPopupOpen, onClose])
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [hasChanges]) // handleRequestClose est stable dans ce contexte
 
     return (
         <div className="teacher-detail-overlay">
             <div className="teacher-detail-card">
-                {/* ❌ croix en haut à droite */}
+                {/* Croix en haut à droite */}
                 <button
                     className="teacher-detail-close"
                     onClick={handleRequestClose}
@@ -90,6 +87,7 @@ export default function TeacherDetailCard({ teacher, onClose }: TeacherDetailCar
                     ✕
                 </button>
 
+                {/* Header pill : titre + nom/prénom + type + icône à droite */}
                 <TeacherModeBadge
                     mode={teacherDraft.mode}
                     variant="header"
@@ -140,12 +138,11 @@ export default function TeacherDetailCard({ teacher, onClose }: TeacherDetailCar
                         }
                         confirmLabel="Enregistrer"
                         cancelLabel="Annuler"
-                        onPopupStateChange={setHasButtonsPopupOpen}
                     />
                 </div>
             </div>
 
-            {/* Popup spécifique pour la croix */}
+            {/* Popup spécifique pour la croix / ESC card */}
             <ConfirmDialog
                 open={openCloseConfirm}
                 title="Modifications non enregistrées"
