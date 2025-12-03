@@ -2,6 +2,7 @@
 // @ts-ignore
 import React, { useState, useEffect } from 'react'
 import Checklist from '../components/Checklist'
+import PageHeader from "../components/common/PageHeader";
 
 interface ChecklistItem {
     id: string
@@ -56,9 +57,13 @@ export default function PlanningMacro(): Element {
 
     return (
         <>
-            <h2 className="page-title">Génération planning macro</h2>
-            <p className="page-sub">Sélectionnez chacun de ces points s'il a été renseigné.</p>
+            {/* TITRE & SOUS-TITRE */}
+            <PageHeader
+                title="Génération planning macro"
+                subtitle="Sélectionnez chacun de ces points s'il a été renseigné."
+            />
 
+            {/* CONTENU DE LA PAGE */}
             <Checklist items={items} onToggle={toggleItem} />
 
             <button className="btn-primary btn-generate" onClick={handleGenerate}>

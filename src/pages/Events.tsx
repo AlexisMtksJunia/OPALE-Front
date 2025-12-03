@@ -9,6 +9,7 @@ import {
     JUNIA_EVENTS_MOCK,
     EXTERNAL_EVENTS_MOCK,
 } from '../mocks/events.mock'
+import PageHeader from '../components/common/PageHeader'
 
 const ALL_EVENTS = [...JUNIA_EVENTS_MOCK, ...EXTERNAL_EVENTS_MOCK]
 
@@ -72,10 +73,10 @@ export default function Events() {
     return (
         <>
             {/* TITRE & SOUS-TITRE */}
-            <h1 className="page-title">Événements</h1>
-            <p className="page-sub">
-                Vue consolidée des événements Junia et externes.
-            </p>
+            <PageHeader
+                title="Événements"
+                subtitle="Vue consolidée des événements Junia et externes."
+            />
 
             {/* CONTENU DE LA PAGE */}
             <div className="events-page">

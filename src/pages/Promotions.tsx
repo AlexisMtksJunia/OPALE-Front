@@ -13,6 +13,8 @@ import {
     usePromotionAdjustPopup,
 } from '../hooks/promotions'
 
+import PageHeader from '../components/common/PageHeader'
+
 export default function Promotions() {
     const {
         cycles,
@@ -55,9 +57,10 @@ export default function Promotions() {
 
     return (
         <div className="promos">
-            <div className="promos-header">
-                <h2 className="page-title">Promotions</h2>
-            </div>
+            <PageHeader
+                title="Promotions"
+                subtitle="Gestion des cycles, promotions et contraintes académiques (mock front uniquement)."
+            />
 
             <div className="promos-grid">
                 {cycles.map((cycle) => (
@@ -79,7 +82,7 @@ export default function Promotions() {
                     aria-label="Ajouter un cycle"
                     title="Ajouter un cycle"
                 >
-                    <img src={icPlus} alt=""/>
+                    <img src={icPlus} alt="" />
                 </button>
             </div>
 
