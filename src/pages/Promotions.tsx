@@ -2,8 +2,8 @@
 import React from 'react'
 import icPlus from '../assets/ic-plus.png'
 
-import PromoEditDialog from '../components/promotions/PromoEditDialog.jsx'
-import PromoAdjustDialog from '../components/promotions/PromoAdjustDialog.jsx'
+import PromoEditDialog from '../components/promotions/PromoEditDialog.tsx'
+import PromoAdjustDialog from '../components/promotions/PromoAdjustDialog.tsx'
 import CycleCard from '../components/promotions/cycles/CycleCard'
 
 import {
