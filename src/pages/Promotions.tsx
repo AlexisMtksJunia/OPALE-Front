@@ -38,7 +38,7 @@ export default function Promotions() {
         addSpecialty,
         removeSpecialty,
         handleSpecialtyChange,
-        hasChanges,
+        hasChanges: promoHasChanges,
     } = usePromotionEditing(cycles, setCycles)
 
     const {
@@ -89,7 +89,7 @@ export default function Promotions() {
             {editingPromo && (
                 <PromoEditDialog
                     editingPromo={editingPromo}
-                    hasChanges={hasChanges}
+                    hasChanges={promoHasChanges}
                     onSubmit={handleSavePromotion}
                     onClose={closeEditPromotion}
                     onFieldChange={handleEditFieldChange}
