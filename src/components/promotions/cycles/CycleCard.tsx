@@ -5,7 +5,7 @@ import icWarning from '../../../assets/ic-warning.png'
 import icModif from '../../../assets/ic-modif.png'
 
 import { hasPromoMismatch } from '../../../utils/promoUtils'
-import { Cycle } from '../../models'
+import { Cycle } from '../../../models'
 import CycleImportDropzone from './CycleImportDropzone'
 
 interface CycleCardProps {

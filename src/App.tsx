@@ -8,6 +8,7 @@ import PlanningMacro from './pages/PlanningMacro'
 import Placeholder from './pages/Placeholder'
 import Login from './pages/Login'
 import Rooms from './pages/Rooms'
+import Events from './pages/Events'
 
 import { useTheme } from './hooks/useTheme'
 
@@ -46,7 +47,7 @@ export default function App(): Element {
                 <Route element={<AppLayout />}>
                     <Route path="/planning" element={<PlanningMacro />} />
                     <Route path="/promotions" element={<Promotions />} />
-                    <Route path="/evenements" element={<Placeholder title="Événements" />} />
+                    <Route path="/evenements" element={<Events />} />
                     <Route path="/teachers" element={<Teachers />} />
                     <Route path="/salles" element={<Rooms />} />
                     <Route path="/parametres" element={<Placeholder title="Paramètres" />} />
