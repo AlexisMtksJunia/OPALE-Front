@@ -1,5 +1,6 @@
 import React from 'react'
 import { EventType, EventSource } from '../../models/CampusEvent'
+import EntityBadge from '../common/EntityBadge'
 
 import icEventJpo from '../../assets/ic-event-jpo.png'
 import icEventExam from '../../assets/ic-event-exam.png'
@@ -13,27 +14,29 @@ interface EventTypeBadgeProps {
     source: EventSource
 }
 
-const TYPE_META = {
-    JOURNEE_PO: { label: 'Journée Portes Ouvertes', icon: icEventJpo },
-    EXAMEN: { label: 'Examen', icon: icEventExam },
-    CONFERENCE: { label: 'Conférence', icon: icEventConference },
-    FORUM: { label: 'Forum', icon: icEventForum },
-    SALON: { label: 'Salon', icon: icEventSalon },
-    AUTRE: { label: 'Autre', icon: icEventOther },
+const TYPE_META: Record<
+    EventType,
+    { icon: string; label: string }
+> = {
+    JPO: { icon: icEventJpo, label: 'Journée Portes Ouvertes' },
+    EXAMEN: { icon: icEventExam, label: 'Examen / Partiels' },
+    CONFERENCE: { icon: icEventConference, label: 'Conférence' },
+    FORUM: { icon: icEventForum, label: 'Forum' },
+    SALON: { icon: icEventSalon, label: 'Salon / Expo' },
+    AUTRE: { icon: icEventOther, label: 'Autre évènement' },
 }
 
 export default function EventTypeBadge({ type, source }: EventTypeBadgeProps) {
     const meta = TYPE_META[type] ?? TYPE_META.AUTRE
+    const sourceClass =
+        source === 'JUNIA' ? 'event-badge-type--junia' : 'event-badge-type--external'
 
     return (
-        <span
-            className={
-                'event-badge-type event-badge-type--' +
-                (source === 'JUNIA' ? 'junia' : 'external')
-            }
-        >
-            <img src={meta.icon} alt="" className="event-badge-icon" />
-            <span className="event-badge-label">{meta.label}</span>
-        </span>
+        <EntityBadge
+            iconSrc={meta.icon}
+            label={meta.label}
+            className={`event-badge-type ${sourceClass}`}
+            // variant par défaut = 'card'
+        />
     )
 }
