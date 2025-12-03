@@ -13,8 +13,6 @@ import {
     usePromotionAdjustPopup,
 } from '../hooks/promotions'
 
-import { hasPromoMismatch } from '../utils/promoUtils'   // ✅ Re-intégré !
-
 export default function Promotions() {
     const {
         cycles,

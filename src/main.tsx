@@ -12,6 +12,7 @@ import './styles/pages/promotions/index.css'
 import './styles/pages/teachers/index.css'
 import './styles/utilities.css'
 import './styles/themes/dark.css'
+import './styles/pages/rooms/index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
