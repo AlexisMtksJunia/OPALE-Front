@@ -45,52 +45,6 @@
     }
 }
 
-/*2 lignes*/
-
-// src/components/teachers/TeachersToolbar.tsx
-                           import React, { useState } from 'react'
-import { PageToolbar, ToolbarRow } from '../common/Toolbar'
-import ToolbarSearch from '../common/ToolbarSearch'
-import { TeachingMode } from '../../models/Teacher'
-
-type ModeFilter = 'ALL' | TeachingMode
-
-                        const MODE_OPTIONS: { value: ModeFilter; label: string }[] = [
-                                                                                     { value: 'ALL', value: 'ALL', label: 'Tous' },
-{ value: 'PRESENTIEL', label: 'Présentiel' },
-{ value: 'HYBRIDE', label: 'Hybride' },
-{ value: 'DISTANCIEL', label: 'Distanciel' },
-]
-
-export default function TeachersToolbar() {
-const [searchValue, setSearchValue] = useState('')
-const [modeFilter, setModeFilter] = useState<ModeFilter>('ALL')
-
-const handleSearchChange = (value: string) => {
-setSearchValue(value)
-console.log('[TEACHERS] Recherche :', value)
-}
-
-    const handleSubjectsClick = () => {
-console.log('[TEACHERS] Ouvrir filtre "Matières"')
-}
-
-    const handleModeChange = (value: ModeFilter) => {
-setModeFilter(value)
-console.log('[TEACHERS] Filtre mode :', value)
-// plus tard : remonter ce filtre au parent via des props
-}
-
-    return (
-    <PageToolbar className="teachers-toolbar">
-{/* Ligne 1 : recherche */}
-<ToolbarRow>
-<ToolbarSearch
-value={searchValue}
-    onChange={handleSearchChange}
-    placeholder="Rechercher un enseignant"
-    />
-    </ToolbarRow>
 
 {/* Ligne 2 : filtres */}
 /*<ToolbarRow className="page-toolbar-row--filters">*/

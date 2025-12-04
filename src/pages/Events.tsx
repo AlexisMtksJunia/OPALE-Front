@@ -5,11 +5,13 @@ import EventsToolbar, {
     TypeFilter,
 } from '../components/events/EventsToolbar'
 import EventCard from '../components/events/EventCard'
+import EventDetailCard from '../components/events/EventDetailCard'
 import {
     JUNIA_EVENTS_MOCK,
     EXTERNAL_EVENTS_MOCK,
 } from '../mocks/events.mock'
 import PageHeader from '../components/common/PageHeader'
+import { CampusEvent } from '../models/CampusEvent'
 
 const ALL_EVENTS = [...JUNIA_EVENTS_MOCK, ...EXTERNAL_EVENTS_MOCK]
 
@@ -19,6 +21,9 @@ export default function Events() {
     const [dateTo, setDateTo] = useState('')
     const [target, setTarget] = useState<TargetFilter>('ALL')
     const [type, setType] = useState<TypeFilter>('ALL')
+    const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(
+        null,
+    )
 
     const filteredEvents = useMemo(() => {
         let items = [...ALL_EVENTS]
@@ -100,7 +105,8 @@ export default function Events() {
                                 {filteredEvents.map((event, index) => {
                                     const currentDate = new Date(event.date)
                                     const currentMonth = currentDate.getMonth()
-                                    const currentYear = currentDate.getFullYear()
+                                    const currentYear =
+                                        currentDate.getFullYear()
 
                                     // Déterminer si on doit insérer un séparateur
                                     let showSeparator = false
@@ -109,30 +115,45 @@ export default function Events() {
                                         // toujours un séparateur avant la première card
                                         showSeparator = true
                                     } else {
-                                        const prev = new Date(filteredEvents[index - 1].date)
+                                        const prev = new Date(
+                                            filteredEvents[index - 1].date,
+                                        )
                                         const prevMonth = prev.getMonth()
                                         const prevYear = prev.getFullYear()
 
-                                        if (prevMonth !== currentMonth || prevYear !== currentYear) {
+                                        if (
+                                            prevMonth !== currentMonth ||
+                                            prevYear !== currentYear
+                                        ) {
                                             showSeparator = true
                                         }
                                     }
 
                                     // Format "Mois Année" en français
-                                    const monthLabel = currentDate.toLocaleDateString('fr-FR', {
-                                        month: 'long',
-                                        year: 'numeric',
-                                    })
+                                    const monthLabel =
+                                        currentDate.toLocaleDateString(
+                                            'fr-FR',
+                                            {
+                                                month: 'long',
+                                                year: 'numeric',
+                                            },
+                                        )
 
                                     return (
                                         <React.Fragment key={event.id}>
                                             {showSeparator && (
                                                 <div className="event-month-separator">
-                                                    {monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}
+                                                    {monthLabel
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                        monthLabel.slice(1)}
                                                 </div>
                                             )}
 
-                                            <EventCard event={event}/>
+                                            <EventCard
+                                                event={event}
+                                                onSelect={setSelectedEvent}
+                                            />
                                         </React.Fragment>
                                     )
                                 })}
@@ -146,6 +167,13 @@ export default function Events() {
                     </div>
                 </div>
             </div>
+
+            {selectedEvent && (
+                <EventDetailCard
+                    event={selectedEvent}
+                    onClose={() => setSelectedEvent(null)}
+                />
+            )}
         </>
     )
 }
