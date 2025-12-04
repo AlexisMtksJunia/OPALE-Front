@@ -1,8 +1,9 @@
 // src/components/rooms/RoomDetailCard.tsx
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Room, RoomType } from '../../models/Room'
 import { ROOM_TYPES } from '../../mocks/rooms.mock'
 import RoomTypeBadge from './RoomTypeBadge'
+import ActionButtonsWithConfirm from '../common/ActionButtonsWithConfirm'
 
 interface RoomDetailCardProps {
     room: Room
@@ -18,7 +19,23 @@ const ROOM_TYPE_LABELS: Record<RoomType, string> = {
     AUTRE: 'Autre',
 }
 
-const floorLabel = (floor: number): string => {
+type DraftRoomState = {
+    name: string
+    fullName: string
+    mainType: RoomType
+    types: RoomType[]
+    description: string
+}
+
+const makeInitialDraft = (room: Room): DraftRoomState => ({
+    name: room.name,
+    fullName: room.fullName ?? '',
+    mainType: room.mainType,
+    types: room.types,
+    description: room.description ?? '',
+})
+
+const floorLabel = (floor: Room['floor']): string => {
     switch (floor) {
         case 0:
             return 'Rez-de-chaussée'
@@ -31,68 +48,89 @@ const floorLabel = (floor: number): string => {
     }
 }
 
+const areTypesEqual = (a: RoomType[], b: RoomType[]) =>
+    a.length === b.length && a.every((t, idx) => t === b[idx])
+
+const buildRoomFromDraft = (room: Room, draft: DraftRoomState): Room => ({
+    ...room,
+    name: draft.name.trim() || room.name,
+    fullName: draft.fullName.trim() || undefined,
+    description: draft.description.trim() || undefined,
+    mainType: draft.mainType,
+    types: draft.types.length ? draft.types : [draft.mainType],
+})
+
 export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCardProps) {
-    const [types, setTypes] = useState<RoomType[]>(room.types)
-    const [mainType, setMainType] = useState<RoomType>(room.mainType)
-    const [description, setDescription] = useState(room.description ?? '')
+    const [draft, setDraft] = useState<DraftRoomState>(() => makeInitialDraft(room))
 
-    const fullName = room.fullName || room.name
+    // Si on ouvre une autre salle, on reset le brouillon
+    useEffect(() => {
+        setDraft(makeInitialDraft(room))
+    }, [room])
 
-    const commit = (
-        nextTypes: RoomType[] = types,
-        nextMain: RoomType = mainType,
-        nextDesc = description
-    ) => {
-        onChange({
-            ...room,
-            types: nextTypes,
-            mainType: nextMain,
-            description: nextDesc,
-        })
+    const { name, fullName, mainType, types, description } = draft
+    const headerTitle = (fullName || name).trim() || room.name
+
+    const hasChanges =
+        room.name !== name ||
+        (room.fullName ?? '') !== fullName ||
+        (room.description ?? '') !== description ||
+        room.mainType !== mainType ||
+        !areTypesEqual(room.types, types)
+
+    const handleChangeName = (value: string) => {
+        setDraft((prev) => ({ ...prev, name: value }))
+    }
+
+    const handleChangeFullName = (value: string) => {
+        setDraft((prev) => ({ ...prev, fullName: value }))
     }
 
     const handleSelectMainType = (type: RoomType) => {
-        // mainType change => il doit toujours être dans la liste des types
-        let nextTypes = types
-        if (!nextTypes.includes(type)) {
-            nextTypes = [...nextTypes, type]
-        }
+        setDraft((prev) => {
+            let nextTypes = prev.types
+            if (!nextTypes.includes(type)) {
+                nextTypes = [...nextTypes, type]
+            }
 
-        setMainType(type)
-        setTypes(nextTypes)
-        console.log('[ROOMS] Change main type', { roomId: room.id, type })
-        commit(nextTypes, type)
+            console.log('[ROOMS] Change main type', { roomId: room.id, type })
+            return {
+                ...prev,
+                mainType: type,
+                types: nextTypes,
+            }
+        })
     }
 
-    const toggleType = (type: RoomType) => {
-        // On empêche de désélectionner le type principal pour rester cohérent
+    const handleToggleType = (type: RoomType) => {
+        // On empêche de désélectionner le type principal
         if (type === mainType) {
             return
         }
 
-        setTypes((prev) => {
-            const exists = prev.includes(type)
-            const next = exists ? prev.filter((t) => t !== type) : [...prev, type]
-            console.log('[ROOMS] Toggle type', { roomId: room.id, type, next })
-            commit(next, mainType)
-            return next
+        setDraft((prev) => {
+            const exists = prev.types.includes(type)
+            const nextTypes = exists
+                ? prev.types.filter((t) => t !== type)
+                : [...prev.types, type]
+
+            console.log('[ROOMS] Toggle type', { roomId: room.id, type, nextTypes })
+
+            return {
+                ...prev,
+                types: nextTypes,
+            }
         })
     }
 
-    const handleDescriptionBlur = () => {
-        if (
-            description !== room.description ||
-            mainType !== room.mainType ||
-            types !== room.types
-        ) {
-            console.log('[ROOMS] Update description', {
-                roomId: room.id,
-                mainType,
-                types,
-                description,
-            })
-            commit(types, mainType, description)
-        }
+    const handleChangeDescription = (value: string) => {
+        setDraft((prev) => ({ ...prev, description: value }))
+    }
+
+    const handleSave = () => {
+        const nextRoom = buildRoomFromDraft(room, draft)
+        console.log('[ROOMS] Save room (mock)', nextRoom)
+        onChange(nextRoom)
     }
 
     return (
@@ -107,106 +145,209 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                     ✕
                 </button>
 
-                {/* Header pill, comme pour les enseignants */}
+                {/* Header pill (inchangé) */}
                 <div className="room-detail-header-badge">
                     <RoomTypeBadge
                         type={mainType}
                         variant="header"
-                        title={fullName}
-                        subtitle={`${room.name} · ${floorLabel(room.floor)}`}
+                        title={headerTitle}
+                        subtitle={`${name || room.name} · ${floorLabel(room.floor)}`}
                     />
                 </div>
 
-                {/* Type principal */}
-                <section className="room-detail-section">
-                    <h3 className="room-detail-section-title">Type principal</h3>
-                    <p className="room-detail-hint">
-                        Utilisé comme type par défaut pour la salle (icône, filtrage…)
-                    </p>
-                    <div className="room-detail-types room-detail-types-main">
-                        {ROOM_TYPES.map((type) => {
-                            const isSelected = mainType === type
-                            return (
-                                <button
-                                    key={type}
-                                    type="button"
-                                    className={
-                                        'room-type-chip room-type-chip-main' +
-                                        (isSelected ? ' room-type-chip-main-selected' : '')
-                                    }
-                                    onClick={() => handleSelectMainType(type)}
-                                >
-                                    <span className="room-type-chip-dot" aria-hidden="true" />
-                                    <span className="room-type-chip-label">
-                                        {ROOM_TYPE_LABELS[type]}
-                                    </span>
-                                </button>
-                            )
-                        })}
-                    </div>
-                </section>
+                {/* Layout 2 colonnes */}
+                <div className="room-detail-layout">
+                    {/* Colonne gauche : identité + types */}
+                    <div className="room-detail-main-column">
+                        <section className="room-detail-section">
+                            <h3 className="room-detail-section-title">
+                                Identité de la salle &amp; types
+                            </h3>
 
-                {/* Types disponibles */}
-                <section className="room-detail-section">
-                    <h3 className="room-detail-section-title">Types disponibles</h3>
-                    <p className="room-detail-hint">
-                        Coche les types compatibles avec cette salle. Le type principal est
-                        toujours inclus.
-                    </p>
-                    <div className="room-detail-types">
-                        {ROOM_TYPES.map((type) => {
-                            const checked = types.includes(type)
-                            const isMain = type === mainType
-
-                            return (
-                                <button
-                                    key={type}
-                                    type="button"
-                                    className={
-                                        'room-type-chip' +
-                                        (checked ? ' room-type-chip-selected' : '') +
-                                        (isMain ? ' room-type-chip-main-lock' : '')
-                                    }
-                                    onClick={() => toggleType(type)}
-                                >
-                                    <span
-                                        className={
-                                            'room-type-chip-checkbox' +
-                                            (checked ? ' is-checked' : '')
-                                        }
-                                        aria-hidden="true"
+                            {/* Nom + surnom */}
+                            <div className="room-detail-identity-grid">
+                                <div className="room-detail-field">
+                                    <label
+                                        className="room-detail-field-label"
+                                        htmlFor="room-name-input"
+                                    >
+                                        Nom court (code salle)
+                                    </label>
+                                    <input
+                                        id="room-name-input"
+                                        className="room-detail-input"
+                                        value={name}
+                                        onChange={(e) => handleChangeName(e.target.value)}
+                                        placeholder="Ex. J001"
                                     />
-                                    <span className="room-type-chip-label">
-                                        {ROOM_TYPE_LABELS[type]}
-                                        {isMain && (
-                                            <span className="room-type-chip-main-tag">
-                                                {' '}
-                                                (principal)
-                                            </span>
-                                        )}
-                                    </span>
-                                </button>
-                            )
-                        })}
-                    </div>
-                    <p className="room-detail-hint room-detail-hint-small">
-                        Le type principal ne peut pas être décoché.
-                    </p>
-                </section>
+                                </div>
 
-                {/* Description */}
-                <section className="room-detail-section">
-                    <h3 className="room-detail-section-title">Description / commentaires</h3>
-                    <textarea
-                        className="room-detail-textarea"
-                        placeholder="Notes sur la salle, équipements, contraintes d’utilisation…"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        onBlur={handleDescriptionBlur}
-                        rows={4}
-                    />
-                </section>
+                                <div className="room-detail-field">
+                                    <label
+                                        className="room-detail-field-label"
+                                        htmlFor="room-fullname-input"
+                                    >
+                                        Surnom / nom complet
+                                    </label>
+                                    <input
+                                        id="room-fullname-input"
+                                        className="room-detail-input"
+                                        value={fullName}
+                                        onChange={(e) => handleChangeFullName(e.target.value)}
+                                        placeholder="Ex. J001_Projet"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Deux colonnes : type principal / types disponibles */}
+                            <div className="room-detail-types-grid">
+                                {/* Colonne gauche : type principal */}
+                                <div className="room-detail-types-column">
+                                    <h3 className="room-detail-section-title">Type principal</h3>
+                                    <p className="room-detail-hint-small">
+                                        Utilisé pour l’icône, le filtrage et la planification.
+                                    </p>
+
+                                    <div className="room-detail-types">
+                                        {ROOM_TYPES.map((type) => {
+                                            const isSelected = type === mainType
+                                            const chipClassName = [
+                                                'room-type-chip',
+                                                'room-type-chip-main',
+                                                isSelected
+                                                    ? 'room-type-chip-selected room-type-chip-main-selected'
+                                                    : '',
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' ')
+
+                                            return (
+                                                <button
+                                                    key={type}
+                                                    type="button"
+                                                    className={chipClassName}
+                                                    onClick={() => handleSelectMainType(type)}
+                                                    aria-pressed={isSelected}
+                                                >
+                                                <span
+                                                    className="room-type-chip-dot"
+                                                    aria-hidden="true"
+                                                />
+                                                    <span className="room-type-chip-label">
+                                                    {ROOM_TYPE_LABELS[type]}
+                                                </span>
+                                                    {isSelected && (
+                                                        <span className="room-type-chip-main-tag">
+                                                        Principal
+                                                    </span>
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Colonne droite : types disponibles */}
+                                <div className="room-detail-types-column">
+                                    <h3 className="room-detail-section-title">Types disponibles</h3>
+                                    <p className="room-detail-hint-small">
+                                        Coche les types compatibles avec cette salle. Le type principal
+                                        est toujours inclus.
+                                    </p>
+
+                                    <div className="room-detail-types">
+                                        {ROOM_TYPES.map((type) => {
+                                            const isChecked = types.includes(type)
+                                            const isMain = type === mainType
+
+                                            const chipClassName = [
+                                                'room-type-chip',
+                                                isChecked ? 'room-type-chip-selected' : '',
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' ')
+
+                                            const checkboxClassName = [
+                                                'room-type-chip-checkbox',
+                                                isChecked ? 'is-checked' : '',
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' ')
+
+                                            return (
+                                                <button
+                                                    key={type}
+                                                    type="button"
+                                                    className={chipClassName}
+                                                    onClick={() => handleToggleType(type)}
+                                                    aria-pressed={isChecked}
+                                                >
+                                                <span
+                                                    className={checkboxClassName}
+                                                    aria-hidden="true"
+                                                />
+                                                    <span className="room-type-chip-label">
+                                                    {ROOM_TYPE_LABELS[type]}
+                                                </span>
+                                                    {isMain && (
+                                                        <span className="room-type-chip-main-lock">
+                                                        Principal
+                                                    </span>
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Colonne droite : description seule (sans boutons) */}
+                    <aside className="room-detail-aside-column">
+                        <section className="room-detail-section room-detail-description-section">
+                            <h3 className="room-detail-section-title">
+                                Description / commentaires
+                            </h3>
+                            <textarea
+                                className="room-detail-textarea"
+                                placeholder="Notes sur la salle, équipements, contraintes d’utilisation…"
+                                value={description}
+                                onChange={(e) => handleChangeDescription(e.target.value)}
+                                rows={8}
+                            />
+                        </section>
+                    </aside>
+                </div>
+
+                {/* Footer boutons – hors des 2 colonnes */}
+                <footer className="room-detail-footer">
+                    <div className="room-detail-actions">
+                        <ActionButtonsWithConfirm
+                            saveLabel="Enregistrer"
+                            cancelLabel="Annuler"
+                            confirmTitle="Enregistrer les modifications"
+                            confirmMessage="Souhaites-tu enregistrer les modifications apportées à cette salle ?"
+                            confirmLabel="Enregistrer"
+                            hasChanges={hasChanges}
+                            cancelDirtyTitle="Modifications non enregistrées"
+                            cancelDirtyMessage={
+                                <>
+                                    Tu as des modifications non enregistrées sur cette salle.
+                                    <br />
+                                    Souhaites-tu les enregistrer avant de fermer ?
+                                </>
+                            }
+                            cancelDirtyConfirmLabel="Enregistrer et fermer"
+                            cancelDirtyDiscardLabel="Fermer sans enregistrer"
+                            onSave={handleSave}
+                            onCancel={onClose}
+                            onAfterSaveConfirm={onClose}
+                        />
+                    </div>
+                </footer>
             </div>
         </div>
     )
+
 }
