@@ -1,5 +1,7 @@
+// src/components/events/EventTypeBadge.tsx
 import React from 'react'
 import { EventType, EventSource } from '../../models/CampusEvent'
+import EntityBadge from '../common/EntityBadge'
 
 import icEventJpo from '../../assets/ic-event-jpo.png'
 import icEventExam from '../../assets/ic-event-exam.png'
@@ -13,35 +15,44 @@ interface EventTypeBadgeProps {
     source: EventSource
 }
 
-const TYPE_META = {
-    JOURNEE_PO: { label: 'Journée Portes Ouvertes', icon: icEventJpo },
-    EXAMEN: { label: 'Examen', icon: icEventExam },
-    CONFERENCE: { label: 'Conférence', icon: icEventConference },
-    FORUM: { label: 'Forum', icon: icEventForum },
-    SALON: { label: 'Salon', icon: icEventSalon },
-    AUTRE: { label: 'Autre', icon: icEventOther },
+/**
+ * Métadonnées par type d'événement :
+ * - label affiché
+ * - icône
+ */
+export const TYPE_META: Record<
+    EventType,
+    { icon: string; label: string }
+> = {
+    JOURNEE_PO: { icon: icEventJpo, label: 'Journée Portes Ouvertes' },
+    EXAMEN: { icon: icEventExam, label: 'Examen / Partiels' },
+    CONFERENCE: { icon: icEventConference, label: 'Conférence' },
+    FORUM: { icon: icEventForum, label: 'Forum' },
+    SALON: { icon: icEventSalon, label: 'Salon / Expo' },
+    AUTRE: { icon: icEventOther, label: 'Autre évènement' },
 }
 
-// ... imports & TYPE_META identiques
-
+/**
+ * Helper exporté pour la fiche détail
+ * (EventDetailCard utilise getEventTypeMeta)
+ */
 export function getEventTypeMeta(type: EventType) {
     return TYPE_META[type] ?? TYPE_META.AUTRE
 }
 
 export default function EventTypeBadge({ type, source }: EventTypeBadgeProps) {
     const meta = getEventTypeMeta(type)
+    const sourceClass =
+        source === 'JUNIA'
+            ? 'event-badge-type--junia'
+            : 'event-badge-type--external'
 
     return (
-        <span
-            className={
-                'event-badge-type event-badge-type--' +
-                (source === 'JUNIA' ? 'junia' : 'external')
-            }
-        >
-            <span className="event-badge-icon">
-                <img src={meta.icon} alt="" aria-hidden="true" />
-            </span>
-            <span className="event-badge-label">{meta.label}</span>
-        </span>
+        <EntityBadge
+            iconSrc={meta.icon}
+            label={meta.label}
+            className={`event-badge-type ${sourceClass}`}
+            // variant par défaut = "card" (pastille dans la colonne droite)
+        />
     )
 }
