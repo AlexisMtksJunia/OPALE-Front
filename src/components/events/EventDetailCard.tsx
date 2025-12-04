@@ -271,9 +271,10 @@ export default function EventDetailCard({
                     <ActionButtonsWithConfirm
                         onCancel={onClose}
                         onSave={handleSave}
+                        onAfterSaveConfirm={isCreate ? onClose : undefined}
                         hasChanges={hasChanges}
                         saveLabel={isCreate ? 'Créer' : 'Enregistrer'}
-                        saveDisabled={isCreate && !isValid}
+                        // ✅ plus de saveDisabled ici pour la création
                         confirmTitle={
                             isCreate
                                 ? 'Créer cet événement'
@@ -322,6 +323,15 @@ export default function EventDetailCard({
                                 : 'Enregistrer et fermer'
                         }
                         cancelDirtyDiscardLabel="Fermer sans enregistrer"
+                        onBeforeSaveClick={() => {
+                            if (isCreate && !isValid) {
+                                window.alert(
+                                    'Merci de remplir tous les champs obligatoires (nom, dates, lieu, type, cible) avant de créer l’événement.',
+                                )
+                                return false
+                            }
+                            return true
+                        }}
                     />
                 </div>
             </div>
