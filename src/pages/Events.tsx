@@ -10,10 +10,27 @@ import {
     JUNIA_EVENTS_MOCK,
     EXTERNAL_EVENTS_MOCK,
 } from '../mocks/events.mock'
-import PageHeader from '../components/common/PageHeader'
 import { CampusEvent } from '../models/CampusEvent'
+import SectionHeader from '../components/common/SectionHeader' // si tu l’utilises pour les mois
 
 const ALL_EVENTS = [...JUNIA_EVENTS_MOCK, ...EXTERNAL_EVENTS_MOCK]
+
+// helpers getMonthKey / getMonthLabel que tu as déjà ou qu’on avait ajoutés
+function getMonthKey(dateStr: string): string {
+    const d = new Date(dateStr)
+    if (Number.isNaN(d.getTime())) return dateStr
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+function getMonthLabel(dateStr: string): string {
+    const d = new Date(dateStr)
+    if (Number.isNaN(d.getTime())) return dateStr
+    const label = d.toLocaleDateString('fr-FR', {
+        month: 'long',
+        year: 'numeric',
+    })
+    return label.charAt(0).toUpperCase() + label.slice(1)
+}
 
 export default function Events() {
     const [searchValue, setSearchValue] = useState('')
@@ -21,9 +38,9 @@ export default function Events() {
     const [dateTo, setDateTo] = useState('')
     const [target, setTarget] = useState<TargetFilter>('ALL')
     const [type, setType] = useState<TypeFilter>('ALL')
-    const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(
-        null,
-    )
+
+    const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(null)
+    const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({})
 
     const filteredEvents = useMemo(() => {
         let items = [...ALL_EVENTS]
@@ -34,7 +51,6 @@ export default function Events() {
                 new Date(a.date).getTime() - new Date(b.date).getTime(),
         )
 
-        // filtre recherche (nom + lieu)
         if (searchValue.trim()) {
             const q = searchValue.trim().toLowerCase()
             items = items.filter(
@@ -44,7 +60,6 @@ export default function Events() {
             )
         }
 
-        // filtre date "à partir du"
         if (dateFrom) {
             const min = new Date(dateFrom).getTime()
             items = items.filter(
@@ -52,7 +67,6 @@ export default function Events() {
             )
         }
 
-        // filtre date "jusqu'au"
         if (dateTo) {
             const max = new Date(dateTo).getTime()
             items = items.filter(
@@ -60,14 +74,12 @@ export default function Events() {
             )
         }
 
-        // filtre cible (Junia / Externe)
         if (target === 'JUNIA') {
             items = items.filter((evt) => evt.source === 'JUNIA')
         } else if (target === 'EXTERNE') {
             items = items.filter((evt) => evt.source === 'EXTERNE')
         }
 
-        // filtre type
         if (type !== 'ALL') {
             items = items.filter((evt) => evt.type === type)
         }
@@ -75,15 +87,73 @@ export default function Events() {
         return items
     }, [searchValue, dateFrom, dateTo, target, type])
 
+    // Regroupement par mois (comme on l’a déjà fait)
+    const monthGroups = useMemo(() => {
+        const groups: {
+            key: string
+            label: string
+            events: CampusEvent[]
+        }[] = []
+        const byKey = new Map<
+            string,
+            { key: string; label: string; events: CampusEvent[] }
+        >()
+
+        for (const evt of filteredEvents) {
+            const key = getMonthKey(evt.date)
+            const label = getMonthLabel(evt.date)
+
+            if (!byKey.has(key)) {
+                const group = { key, label, events: [] as CampusEvent[] }
+                byKey.set(key, group)
+                groups.push(group)
+            }
+            byKey.get(key)!.events.push(evt)
+        }
+
+        return groups
+    }, [filteredEvents])
+
+    const toggleMonth = (key: string) => {
+        setOpenMonths((prev) => ({
+            ...prev,
+            [key]: !(prev[key] ?? true),
+        }))
+    }
+
+    const handleSelectEvent = (evt: CampusEvent) => {
+        setSelectedEvent(evt)
+    }
+
+    // 👇 clic sur le bouton "+"
+    const handleCreateRequested = () => {
+        const todayIso = new Date().toISOString().slice(0, 10)
+
+        const newEvent: CampusEvent = {
+            id: 'new-event',
+            name: '',
+            date: '', // champs de dates vides dans le détail
+            location: '',
+            type: 'AUTRE',
+            source: 'JUNIA',
+            // si ton modèle a d'autres champs obligatoires, les ajouter ici
+        } as CampusEvent
+
+        setSelectedEvent(newEvent)
+        console.log('[EVENTS] Open create event form', newEvent, todayIso)
+    }
+
+    const handleCloseDetail = () => {
+        setSelectedEvent(null)
+    }
+
     return (
         <>
-            {/* TITRE & SOUS-TITRE */}
-            <PageHeader
-                title="Événements"
-                subtitle="Vue consolidée des événements Junia et externes."
-            />
+            <h1 className="page-title">Événements</h1>
+            <p className="page-sub">
+                Vue consolidée des événements Junia et externes.
+            </p>
 
-            {/* CONTENU DE LA PAGE */}
             <div className="events-page">
                 <div className="events-page-body">
                     <EventsToolbar
@@ -97,64 +167,46 @@ export default function Events() {
                         onTargetChange={setTarget}
                         type={type}
                         onTypeChange={setType}
+                        onCreateRequested={handleCreateRequested}
                     />
 
                     <div className="events-list-wrapper">
-                        {filteredEvents.length > 0 ? (
+                        {monthGroups.length > 0 ? (
                             <div className="events-list">
-                                {filteredEvents.map((event, index) => {
-                                    const currentDate = new Date(event.date)
-                                    const currentMonth = currentDate.getMonth()
-                                    const currentYear =
-                                        currentDate.getFullYear()
-
-                                    // Déterminer si on doit insérer un séparateur
-                                    let showSeparator = false
-
-                                    if (index === 0) {
-                                        // toujours un séparateur avant la première card
-                                        showSeparator = true
-                                    } else {
-                                        const prev = new Date(
-                                            filteredEvents[index - 1].date,
-                                        )
-                                        const prevMonth = prev.getMonth()
-                                        const prevYear = prev.getFullYear()
-
-                                        if (
-                                            prevMonth !== currentMonth ||
-                                            prevYear !== currentYear
-                                        ) {
-                                            showSeparator = true
-                                        }
-                                    }
-
-                                    // Format "Mois Année" en français
-                                    const monthLabel =
-                                        currentDate.toLocaleDateString(
-                                            'fr-FR',
-                                            {
-                                                month: 'long',
-                                                year: 'numeric',
-                                            },
-                                        )
+                                {monthGroups.map((group) => {
+                                    const isOpen =
+                                        openMonths[group.key] ?? true
 
                                     return (
-                                        <React.Fragment key={event.id}>
-                                            {showSeparator && (
-                                                <div className="event-month-separator">
-                                                    {monthLabel
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                        monthLabel.slice(1)}
+                                        <section
+                                            key={group.key}
+                                            className="events-month-group"
+                                        >
+                                            <SectionHeader
+                                                title={group.label}
+                                                isOpen={isOpen}
+                                                onToggle={() =>
+                                                    toggleMonth(group.key)
+                                                }
+                                                wrapperClassName="events-month-header"
+                                            />
+
+                                            {isOpen && (
+                                                <div className="events-month-group-cards">
+                                                    {group.events.map(
+                                                        (event) => (
+                                                            <EventCard
+                                                                key={event.id}
+                                                                event={event}
+                                                                onSelect={
+                                                                    handleSelectEvent
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
                                                 </div>
                                             )}
-
-                                            <EventCard
-                                                event={event}
-                                                onSelect={setSelectedEvent}
-                                            />
-                                        </React.Fragment>
+                                        </section>
                                     )
                                 })}
                             </div>
@@ -168,10 +220,11 @@ export default function Events() {
                 </div>
             </div>
 
+            {/* Detail card (vue / création / édition) */}
             {selectedEvent && (
                 <EventDetailCard
                     event={selectedEvent}
-                    onClose={() => setSelectedEvent(null)}
+                    onClose={handleCloseDetail}
                 />
             )}
         </>

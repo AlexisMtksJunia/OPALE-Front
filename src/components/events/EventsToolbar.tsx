@@ -3,6 +3,7 @@ import React from 'react'
 import { EventType } from '../../models/CampusEvent'
 import { PageToolbar, ToolbarRow } from '../common/Toolbar'
 import ToolbarSearch from '../common/ToolbarSearch'
+import icPlus from '../../assets/ic-plus.png'
 
 export type TargetFilter = 'ALL' | 'JUNIA' | 'EXTERNE'
 export type TypeFilter = 'ALL' | EventType
@@ -22,6 +23,9 @@ interface EventsToolbarProps {
 
     type: TypeFilter
     onTypeChange: (value: TypeFilter) => void
+
+    // 👇 nouveau : clic sur "+"
+    onCreateRequested: () => void
 }
 
 const EVENT_TYPE_OPTIONS = [
@@ -45,23 +49,34 @@ export default function EventsToolbar({
                                           onTargetChange,
                                           type,
                                           onTypeChange,
+                                          onCreateRequested,
                                       }: EventsToolbarProps) {
     return (
         <PageToolbar className="events-toolbar">
-            {/* Ligne 1 : recherche */}
+            {/* Ligne 1 : search + bouton + */}
             <ToolbarRow>
                 <ToolbarSearch
                     value={searchValue}
                     onChange={onSearchChange}
                     placeholder="Rechercher un événement…"
                 />
+
+                <button
+                    type="button"
+                    className="events-toolbar-plus-btn"
+                    onClick={onCreateRequested}
+                    aria-label="Créer un événement"
+                    title="Créer un événement"
+                >
+                    <img src={icPlus} alt="" className="events-toolbar-plus-icon"/>
+                </button>
             </ToolbarRow>
 
             {/* Ligne 2 : filtres */}
             <ToolbarRow className="page-toolbar-row--filters events-toolbar-filters">
                 {/* Filtre dates */}
                 <div className="toolbar-filter">
-                    <label className="toolbar-filter-label">
+                <label className="toolbar-filter-label">
                         À partir du
                         <input
                             type="date"
