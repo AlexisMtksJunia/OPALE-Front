@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import '../styles/pages/login/login-page.css';
 import { useNavigate } from 'react-router-dom';
 
-import logoFull from '../assets/logo-full.png';
+import logoFull from '../assets/logo/logo-full.png';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login(): Element {

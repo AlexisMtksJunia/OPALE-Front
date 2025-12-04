@@ -3,12 +3,12 @@ import React from 'react'
 import { EventType, EventSource } from '../../models/CampusEvent'
 import EntityBadge from '../common/EntityBadge'
 
-import icEventJpo from '../../assets/ic-event-jpo.png'
-import icEventExam from '../../assets/ic-event-exam.png'
-import icEventConference from '../../assets/ic-event-conference.png'
-import icEventForum from '../../assets/ic-event-forum.png'
-import icEventSalon from '../../assets/ic-event-salon.png'
-import icEventOther from '../../assets/ic-event-other.png'
+import icEventJpo from '../../assets/events/ic-event-jpo.png'
+import icEventExam from '../../assets/events/ic-event-exam.png'
+import icEventConference from '../../assets/events/ic-event-conference.png'
+import icEventForum from '../../assets/events/ic-event-forum.png'
+import icEventSalon from '../../assets/events/ic-event-salon.png'
+import icEventOther from '../../assets/events/ic-event-other.png'
 
 interface EventTypeBadgeProps {
     type: EventType
