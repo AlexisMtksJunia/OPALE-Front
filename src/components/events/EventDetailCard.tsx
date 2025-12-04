@@ -1,4 +1,4 @@
-import React, { useEffect }  from 'react'
+import React, { useEffect } from 'react'
 import { CampusEvent, EventType } from '../../models/CampusEvent'
 import { getEventTypeMeta } from './EventTypeBadge'
 import ActionButtonsWithConfirm from '../common/ActionButtonsWithConfirm'
@@ -7,6 +7,7 @@ import { useEventDetail } from '../../hooks/events/useEventDetail'
 interface EventDetailCardProps {
     event: CampusEvent
     onClose: () => void
+    mode?: 'edit' | 'create'
 }
 
 function formatDate(date: string | undefined): string {
@@ -20,8 +21,23 @@ function formatDate(date: string | undefined): string {
     })
 }
 
-export default function EventDetailCard({ event, onClose }: EventDetailCardProps) {
+export default function EventDetailCard({
+                                            event,
+                                            onClose,
+                                            mode = 'edit',
+                                        }: EventDetailCardProps) {
+    const isCreate = mode === 'create' || event.id === 'new-event'
     const { draft, hasChanges, updateField, handleSave } = useEventDetail(event)
+
+    // 🔎 validation basique : tous les champs obligatoires doivent être remplis
+    const isValid =
+        draft.name.trim().length > 0 &&
+        draft.startDate.trim().length > 0 &&
+        draft.endDate.trim().length > 0 &&
+        draft.location.trim().length > 0 &&
+        !!draft.type &&
+        !!draft.source
+
     const typeMeta = getEventTypeMeta(draft.type)
 
     // 🔥 ESC ferme la fiche événement
@@ -67,17 +83,19 @@ export default function EventDetailCard({ event, onClose }: EventDetailCardProps
                     >
                         <div className="event-header-left">
                             <div className="event-header-title">
-                                {draft.name}
+                                {draft.name || (isCreate ? 'Nouvel événement' : '')}
                             </div>
                             <div className="event-header-subtitle">
                                 {formatDate(draft.startDate)}
-                                {draft.startDate !== draft.endDate && (
-                                    <>
-                                        {' → '}
-                                        {formatDate(draft.endDate)}
-                                    </>
-                                )}
-                                {' · '}
+                                {draft.startDate &&
+                                    draft.endDate &&
+                                    draft.startDate !== draft.endDate && (
+                                        <>
+                                            {' → '}
+                                            {formatDate(draft.endDate)}
+                                        </>
+                                    )}
+                                {draft.location && ' · '}
                                 {draft.location}
                             </div>
                         </div>
@@ -126,7 +144,10 @@ export default function EventDetailCard({ event, onClose }: EventDetailCardProps
                                     className="event-detail-input"
                                     value={draft.startDate}
                                     onChange={(e) =>
-                                        updateField('startDate', e.target.value)
+                                        updateField(
+                                            'startDate',
+                                            e.target.value,
+                                        )
                                     }
                                 />
                             </dd>
@@ -154,7 +175,10 @@ export default function EventDetailCard({ event, onClose }: EventDetailCardProps
                                     className="event-detail-input"
                                     value={draft.location}
                                     onChange={(e) =>
-                                        updateField('location', e.target.value)
+                                        updateField(
+                                            'location',
+                                            e.target.value,
+                                        )
                                     }
                                 />
                             </dd>
@@ -242,23 +266,62 @@ export default function EventDetailCard({ event, onClose }: EventDetailCardProps
                     />
                 </section>
 
-                {/* Footer : boutons communs Annuler / Enregistrer */}
+                {/* Footer : boutons communs Annuler / Enregistrer ou Créer */}
                 <div className="event-detail-footer">
                     <ActionButtonsWithConfirm
                         onCancel={onClose}
                         onSave={handleSave}
                         hasChanges={hasChanges}
+                        saveLabel={isCreate ? 'Créer' : 'Enregistrer'}
+                        saveDisabled={isCreate && !isValid}
+                        confirmTitle={
+                            isCreate
+                                ? 'Créer cet événement'
+                                : 'Confirmer les modifications'
+                        }
                         confirmMessage={
+                            isCreate ? (
+                                <>
+                                    Vous êtes sur le point de créer
+                                    l&apos;événement{' '}
+                                    <strong>
+                                        {draft.name || 'sans titre'}
+                                    </strong>
+                                    .
+                                    <br />
+                                    Confirmer&nbsp;?
+                                </>
+                            ) : (
+                                <>
+                                    Vous êtes sur le point d’enregistrer les
+                                    modifications pour{' '}
+                                    <strong>{draft.name}</strong>.
+                                    <br />
+                                    Confirmer&nbsp;?
+                                </>
+                            )
+                        }
+                        confirmLabel={isCreate ? 'Créer' : 'Enregistrer'}
+                        cancelLabel="Annuler"
+                        cancelDirtyTitle="Modifications non enregistrées"
+                        cancelDirtyMessage={
                             <>
-                                Vous êtes sur le point d’enregistrer les
-                                modifications pour{' '}
-                                <strong>{draft.name}</strong>.
-                                <br />
-                                Confirmer ?
+                                <p>
+                                    Vous avez modifié cette fiche
+                                    événement.
+                                </p>
+                                <p>
+                                    Souhaitez-vous enregistrer les
+                                    changements avant de fermer&nbsp;?
+                                </p>
                             </>
                         }
-                        confirmLabel="Enregistrer"
-                        cancelLabel="Annuler"
+                        cancelDirtyConfirmLabel={
+                            isCreate
+                                ? 'Créer et fermer'
+                                : 'Enregistrer et fermer'
+                        }
+                        cancelDirtyDiscardLabel="Fermer sans enregistrer"
                     />
                 </div>
             </div>

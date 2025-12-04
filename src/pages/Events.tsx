@@ -40,6 +40,7 @@ export default function Events() {
     const [type, setType] = useState<TypeFilter>('ALL')
 
     const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(null)
+    const [detailMode, setDetailMode] = useState<'edit' | 'create'>('edit')
     const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({})
 
     const filteredEvents = useMemo(() => {
@@ -122,25 +123,28 @@ export default function Events() {
     }
 
     const handleSelectEvent = (evt: CampusEvent) => {
+        setDetailMode('edit')
         setSelectedEvent(evt)
     }
 
-    // 👇 clic sur le bouton "+"
+    // clic sur le bouton "+"
     const handleCreateRequested = () => {
         const todayIso = new Date().toISOString().slice(0, 10)
 
         const newEvent: CampusEvent = {
             id: 'new-event',
             name: '',
-            date: '', // champs de dates vides dans le détail
+            startDate: '',
+            endDate: '',
             location: '',
             type: 'AUTRE',
             source: 'JUNIA',
-            // si ton modèle a d'autres champs obligatoires, les ajouter ici
-        } as CampusEvent
+            description: '',
+        }
 
+        setDetailMode('create')
         setSelectedEvent(newEvent)
-        console.log('[EVENTS] Open create event form', newEvent, todayIso)
+        console.log('[EVENTS] Open create event form', newEvent)
     }
 
     const handleCloseDetail = () => {
@@ -224,7 +228,11 @@ export default function Events() {
             {selectedEvent && (
                 <EventDetailCard
                     event={selectedEvent}
-                    onClose={handleCloseDetail}
+                    mode={detailMode}
+                    onClose={() => {
+                        setSelectedEvent(null)
+                        setDetailMode('edit')
+                    }}
                 />
             )}
         </>
