@@ -1,9 +1,14 @@
 // src/components/rooms/RoomDetailCard.tsx
+
 import React, { useEffect, useState } from 'react'
 import { Room, RoomType } from '../../models/Room'
 import { ROOM_TYPES } from '../../mocks/rooms.mock'
 import RoomTypeBadge from './RoomTypeBadge'
-import ActionButtonsWithConfirm from '../common/ActionButtonsWithConfirm'
+import DetailCardHeader from '../common/DetailCardHeader'
+import DetailCardFooter from '../common/DetailCardFooter'
+import DetailCardBody from '../common/DetailCardBody'
+import ConfirmDialog from '../common/ConfirmDialog'
+import { useDetailDirtyClose } from '../../hooks/common/useDetailDirtyClose'
 
 interface RoomDetailCardProps {
     room: Room
@@ -19,22 +24,6 @@ const ROOM_TYPE_LABELS: Record<RoomType, string> = {
     AUTRE: 'Autre',
 }
 
-type DraftRoomState = {
-    name: string
-    fullName: string
-    mainType: RoomType
-    types: RoomType[]
-    description: string
-}
-
-const makeInitialDraft = (room: Room): DraftRoomState => ({
-    name: room.name,
-    fullName: room.fullName ?? '',
-    mainType: room.mainType,
-    types: room.types,
-    description: room.description ?? '',
-})
-
 const floorLabel = (floor: Room['floor']): string => {
     switch (floor) {
         case 0:
@@ -48,27 +37,26 @@ const floorLabel = (floor: Room['floor']): string => {
     }
 }
 
-const areTypesEqual = (a: RoomType[], b: RoomType[]) =>
-    a.length === b.length && a.every((t, idx) => t === b[idx])
+export default function RoomDetailCard({
+                                           room,
+                                           onClose,
+                                           onChange,
+                                       }: RoomDetailCardProps) {
+    const [name, setName] = useState(room.name)
+    const [fullName, setFullName] = useState(room.fullName ?? '')
+    const [mainType, setMainType] = useState<RoomType>(room.mainType)
+    const [types, setTypes] = useState<RoomType[]>(room.types)
+    const [description, setDescription] = useState(room.description ?? '')
 
-const buildRoomFromDraft = (room: Room, draft: DraftRoomState): Room => ({
-    ...room,
-    name: draft.name.trim() || room.name,
-    fullName: draft.fullName.trim() || undefined,
-    description: draft.description.trim() || undefined,
-    mainType: draft.mainType,
-    types: draft.types.length ? draft.types : [draft.mainType],
-})
-
-export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCardProps) {
-    const [draft, setDraft] = useState<DraftRoomState>(() => makeInitialDraft(room))
-
-    // Si on ouvre une autre salle, on reset le brouillon
+    // synchro si on change de salle sans fermer la modale
     useEffect(() => {
-        setDraft(makeInitialDraft(room))
+        setName(room.name)
+        setFullName(room.fullName ?? '')
+        setMainType(room.mainType)
+        setTypes(room.types)
+        setDescription(room.description ?? '')
     }, [room])
 
-    const { name, fullName, mainType, types, description } = draft
     const headerTitle = (fullName || name).trim() || room.name
 
     const hasChanges =
@@ -76,84 +64,86 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
         (room.fullName ?? '') !== fullName ||
         (room.description ?? '') !== description ||
         room.mainType !== mainType ||
-        !areTypesEqual(room.types, types)
-
-    const handleChangeName = (value: string) => {
-        setDraft((prev) => ({ ...prev, name: value }))
-    }
-
-    const handleChangeFullName = (value: string) => {
-        setDraft((prev) => ({ ...prev, fullName: value }))
-    }
+        room.types.length !== types.length ||
+        room.types.some((t, idx) => t !== types[idx])
 
     const handleSelectMainType = (type: RoomType) => {
-        setDraft((prev) => {
-            let nextTypes = prev.types
+        setMainType(type)
+
+        setTypes((prevTypes) => {
+            let nextTypes = prevTypes
+
             if (!nextTypes.includes(type)) {
                 nextTypes = [...nextTypes, type]
             }
 
             console.log('[ROOMS] Change main type', { roomId: room.id, type })
-            return {
-                ...prev,
-                mainType: type,
-                types: nextTypes,
-            }
+
+            return nextTypes
         })
     }
 
     const handleToggleType = (type: RoomType) => {
-        // On empêche de désélectionner le type principal
-        if (type === mainType) {
-            return
-        }
+        if (type === mainType) return
 
-        setDraft((prev) => {
-            const exists = prev.types.includes(type)
+        setTypes((prevTypes) => {
+            const exists = prevTypes.includes(type)
             const nextTypes = exists
-                ? prev.types.filter((t) => t !== type)
-                : [...prev.types, type]
+                ? prevTypes.filter((t) => t !== type)
+                : [...prevTypes, type]
 
             console.log('[ROOMS] Toggle type', { roomId: room.id, type, nextTypes })
 
-            return {
-                ...prev,
-                types: nextTypes,
-            }
+            return nextTypes
         })
     }
 
-    const handleChangeDescription = (value: string) => {
-        setDraft((prev) => ({ ...prev, description: value }))
-    }
-
     const handleSave = () => {
-        const nextRoom = buildRoomFromDraft(room, draft)
+        const nextRoom: Room = {
+            ...room,
+            name: name.trim() || room.name,
+            fullName: fullName.trim() || undefined,
+            description: description.trim() || undefined,
+            mainType,
+            types: types.length ? types : [mainType],
+        }
+
         console.log('[ROOMS] Save room (mock)', nextRoom)
         onChange(nextRoom)
     }
 
+    const {
+        handleRequestClose,
+        isConfirmOpen,
+        handleConfirmSaveAndClose,
+        handleDiscardAndClose,
+        handleConfirmDialogRequestClose,
+    } = useDetailDirtyClose({
+        hasChanges,
+        onClose,
+        onSaveAndClose: () => {
+            handleSave()
+            onClose()
+        },
+        ignoreWhenSelectorExists: '.modal-overlay',
+    })
+
     return (
         <div className="room-detail-overlay" role="dialog" aria-modal="true">
-            <div className="room-detail-card">
-                <button
-                    type="button"
-                    className="room-detail-close"
-                    onClick={onClose}
-                    aria-label="Fermer la fiche salle"
+            <DetailCardBody className="room-detail-card">
+                <DetailCardHeader
+                    onClose={handleRequestClose}
+                    closeAriaLabel="Fermer la fiche salle"
+                    closeButtonClassName="room-detail-close"
+                    headerClassName="room-detail-header-badge"
                 >
-                    ✕
-                </button>
-
-                {/* Header pill (inchangé) */}
-                <div className="room-detail-header-badge">
                     <RoomTypeBadge
                         type={mainType}
                         variant="header"
                         title={headerTitle}
                         subtitle={`${name || room.name} · ${floorLabel(room.floor)}`}
                     />
-                </div>
+                </DetailCardHeader>
 
                 {/* Layout 2 colonnes */}
                 <div className="room-detail-layout">
@@ -177,7 +167,7 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                                         id="room-name-input"
                                         className="room-detail-input"
                                         value={name}
-                                        onChange={(e) => handleChangeName(e.target.value)}
+                                        onChange={(e) => setName(e.target.value)}
                                         placeholder="Ex. J001"
                                     />
                                 </div>
@@ -193,7 +183,7 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                                         id="room-fullname-input"
                                         className="room-detail-input"
                                         value={fullName}
-                                        onChange={(e) => handleChangeFullName(e.target.value)}
+                                        onChange={(e) => setFullName(e.target.value)}
                                         placeholder="Ex. J001_Projet"
                                     />
                                 </div>
@@ -203,9 +193,12 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                             <div className="room-detail-types-grid">
                                 {/* Colonne gauche : type principal */}
                                 <div className="room-detail-types-column">
-                                    <h3 className="room-detail-section-title">Type principal</h3>
+                                    <h3 className="room-detail-section-title">
+                                        Type principal
+                                    </h3>
                                     <p className="room-detail-hint-small">
-                                        Utilisé pour l’icône, le filtrage et la planification.
+                                        Utilisé pour l’icône, le filtrage et la
+                                        planification.
                                     </p>
 
                                     <div className="room-detail-types">
@@ -226,20 +219,22 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                                                     key={type}
                                                     type="button"
                                                     className={chipClassName}
-                                                    onClick={() => handleSelectMainType(type)}
+                                                    onClick={() =>
+                                                        handleSelectMainType(type)
+                                                    }
                                                     aria-pressed={isSelected}
                                                 >
-                                                <span
-                                                    className="room-type-chip-dot"
-                                                    aria-hidden="true"
-                                                />
+                                                    <span
+                                                        className="room-type-chip-dot"
+                                                        aria-hidden="true"
+                                                    />
                                                     <span className="room-type-chip-label">
-                                                    {ROOM_TYPE_LABELS[type]}
-                                                </span>
+                                                        {ROOM_TYPE_LABELS[type]}
+                                                    </span>
                                                     {isSelected && (
                                                         <span className="room-type-chip-main-tag">
-                                                        Principal
-                                                    </span>
+                                                            Principal
+                                                        </span>
                                                     )}
                                                 </button>
                                             )
@@ -249,10 +244,13 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
 
                                 {/* Colonne droite : types disponibles */}
                                 <div className="room-detail-types-column">
-                                    <h3 className="room-detail-section-title">Types disponibles</h3>
+                                    <h3 className="room-detail-section-title">
+                                        Types disponibles
+                                    </h3>
                                     <p className="room-detail-hint-small">
-                                        Coche les types compatibles avec cette salle. Le type principal
-                                        est toujours inclus.
+                                        Coche les types compatibles avec cette
+                                        salle. Le type principal est toujours
+                                        inclus.
                                     </p>
 
                                     <div className="room-detail-types">
@@ -262,7 +260,9 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
 
                                             const chipClassName = [
                                                 'room-type-chip',
-                                                isChecked ? 'room-type-chip-selected' : '',
+                                                isChecked
+                                                    ? 'room-type-chip-selected'
+                                                    : '',
                                             ]
                                                 .filter(Boolean)
                                                 .join(' ')
@@ -279,20 +279,22 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                                                     key={type}
                                                     type="button"
                                                     className={chipClassName}
-                                                    onClick={() => handleToggleType(type)}
+                                                    onClick={() =>
+                                                        handleToggleType(type)
+                                                    }
                                                     aria-pressed={isChecked}
                                                 >
-                                                <span
-                                                    className={checkboxClassName}
-                                                    aria-hidden="true"
-                                                />
+                                                    <span
+                                                        className={checkboxClassName}
+                                                        aria-hidden="true"
+                                                    />
                                                     <span className="room-type-chip-label">
-                                                    {ROOM_TYPE_LABELS[type]}
-                                                </span>
+                                                        {ROOM_TYPE_LABELS[type]}
+                                                    </span>
                                                     {isMain && (
                                                         <span className="room-type-chip-main-lock">
-                                                        Principal
-                                                    </span>
+                                                            Principal
+                                                        </span>
                                                     )}
                                                 </button>
                                             )
@@ -303,7 +305,7 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                         </section>
                     </div>
 
-                    {/* Colonne droite : description seule (sans boutons) */}
+                    {/* Colonne droite : description seule */}
                     <aside className="room-detail-aside-column">
                         <section className="room-detail-section room-detail-description-section">
                             <h3 className="room-detail-section-title">
@@ -313,7 +315,7 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                                 className="room-detail-textarea"
                                 placeholder="Notes sur la salle, équipements, contraintes d’utilisation…"
                                 value={description}
-                                onChange={(e) => handleChangeDescription(e.target.value)}
+                                onChange={(e) => setDescription(e.target.value)}
                                 rows={8}
                             />
                         </section>
@@ -321,33 +323,48 @@ export default function RoomDetailCard({ room, onClose, onChange }: RoomDetailCa
                 </div>
 
                 {/* Footer boutons – hors des 2 colonnes */}
-                <footer className="room-detail-footer">
-                    <div className="room-detail-actions">
-                        <ActionButtonsWithConfirm
-                            saveLabel="Enregistrer"
-                            cancelLabel="Annuler"
-                            confirmTitle="Enregistrer les modifications"
-                            confirmMessage="Souhaites-tu enregistrer les modifications apportées à cette salle ?"
-                            confirmLabel="Enregistrer"
-                            hasChanges={hasChanges}
-                            cancelDirtyTitle="Modifications non enregistrées"
-                            cancelDirtyMessage={
-                                <>
-                                    Tu as des modifications non enregistrées sur cette salle.
-                                    <br />
-                                    Souhaites-tu les enregistrer avant de fermer ?
-                                </>
-                            }
-                            cancelDirtyConfirmLabel="Enregistrer et fermer"
-                            cancelDirtyDiscardLabel="Fermer sans enregistrer"
-                            onSave={handleSave}
-                            onCancel={onClose}
-                            onAfterSaveConfirm={onClose}
-                        />
-                    </div>
-                </footer>
-            </div>
+                <DetailCardFooter
+                    saveLabel="Enregistrer"
+                    cancelLabel="Annuler"
+                    confirmTitle="Enregistrer les modifications"
+                    confirmMessage="Souhaites-tu enregistrer les modifications apportées à cette salle ?"
+                    confirmLabel="Enregistrer"
+                    hasChanges={hasChanges}
+                    cancelDirtyTitle="Modifications non enregistrées"
+                    cancelDirtyMessage={
+                        <>
+                            Tu as des modifications non enregistrées sur cette
+                            salle.
+                            <br />
+                            Souhaites-tu les enregistrer avant de fermer ?
+                        </>
+                    }
+                    cancelDirtyConfirmLabel="Enregistrer et fermer"
+                    cancelDirtyDiscardLabel="Fermer sans enregistrer"
+                    onSave={handleSave}
+                    onCancel={onClose}
+                    onAfterSaveConfirm={onClose}
+                />
+            </DetailCardBody>
+
+            {/* Popup spécifique ESC / croix */}
+            <ConfirmDialog
+                open={isConfirmOpen}
+                title="Modifications non enregistrées"
+                message={
+                    <>
+                        <p>Tu as des modifications non enregistrées sur cette salle.</p>
+                        <p>Souhaites-tu les enregistrer avant de fermer&nbsp;?</p>
+                    </>
+                }
+                confirmLabel="Enregistrer et fermer"
+                cancelLabel="Fermer sans enregistrer"
+                confirmClassName="btn-primary"
+                cancelClassName="btn-danger"
+                onConfirm={handleConfirmSaveAndClose}
+                onCancel={handleDiscardAndClose}
+                onRequestClose={handleConfirmDialogRequestClose}
+            />
         </div>
     )
-
 }

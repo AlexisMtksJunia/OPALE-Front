@@ -1,6 +1,10 @@
 /* src/styles/pages/rooms/_detail-modal.css */
+
 @layer pages {
-    /* Overlay + carte */
+    /* ============================
+       Overlay
+       ============================ */
+
     .room-detail-overlay {
         position: fixed;
         inset: 0;
@@ -11,147 +15,23 @@
         z-index: 2000;
     }
 
+    /* ============================
+       Card layout spécifique Rooms
+       (le shell .detail-card est commun)
+       ============================ */
+
     .room-detail-card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        background: var(--color-surface, #fff);
-        border-radius: 1rem;
+        /* On garde la largeur plus généreuse pour les salles */
         width: min(1080px, 96vw);
         max-height: min(720px, 96vh);
-        padding: 1.6rem 1.8rem 1.4rem;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
-        animation: roomFadeInUp 180ms ease;
-        overflow: hidden;
-    }
-
-    @keyframes roomFadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .room-detail-close {
-        position: absolute;
-        top: 0.5rem;
-        right: 1rem;
-        background: transparent;
-        border: none;
-        font-size: 1.3rem;
-        cursor: pointer;
-        color: var(--muted-strong, #64748b);
-    }
-
-    .room-detail-close:hover {
-        color: var(--primary);
-    }
-
-    /* Header badge */
-    .room-detail-header-badge {
-        width: 100%;
-        margin-bottom: 1.25rem;
-    }
-
-    .room-type-badge.room-type-badge-header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-
-        padding: 1rem 1.4rem;
-        min-height: 68px;
-
-        border-radius: 22px;
-        border: 1px solid transparent;
-        box-shadow: var(--shadow-md);
-
-        background: var(--panel-soft); /* ← important, tu l’avais dans ton thème */
-        text-align: left;
-    }
-
-    .room-header-left {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        gap: 2px;
-        flex: 1;
-        min-width: 0;
     }
 
-    .room-header-title {
-        font-size: 1.18rem;
-        font-weight: 700;
-        color: var(--text);
-    }
+    /* ============================
+       Sections
+       ============================ */
 
-    .room-header-subtitle {
-        font-size: 0.9rem;
-        color: var(--muted);
-    }
-
-    .room-header-right {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        flex-shrink: 0;
-    }
-
-    .room-header-right .room-type-icon {
-        width: 2.2rem;
-        height: 2.2rem;
-    }
-
-    .room-header-right .room-type-label {
-        font-size: 0.95rem;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .room-type-badge-header.room-type-td {
-        background: rgba(59, 130, 246, 0.18);
-        border-color: rgba(59, 130, 246, 0.4);
-        color: #1d4ed8;
-    }
-
-    .room-type-badge-header.room-type-tp_electronique {
-        background: rgba(16, 185, 129, 0.18);
-        border-color: rgba(16, 185, 129, 0.4);
-        color: #065f46;
-    }
-
-    .room-type-badge-header.room-type-tp_numerique {
-        background: rgba(14, 165, 233, 0.18);
-        border-color: rgba(14, 165, 233, 0.4);
-        color: #0369a1;
-    }
-
-    .room-type-badge-header.room-type-projet {
-        background: rgba(234, 179, 8, 0.18);
-        border-color: rgba(234, 179, 8, 0.4);
-        color: #92400e;
-    }
-
-    .room-type-badge-header.room-type-autre {
-        background: rgba(148, 163, 184, 0.2);
-        border-color: rgba(148, 163, 184, 0.45);
-        color: #475569;
-    }
-
-    @media (max-width: 640px) {
-        .room-type-badge.room-type-badge-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.8rem;
-            padding: 1rem;
-        }
-    }
-
-    /* Sections */
     .room-detail-section {
         border-top: 1px solid var(--border-subtle);
         padding-top: 0.9rem;
@@ -192,7 +72,10 @@
         margin-top: 0.1rem;
     }
 
-    /* Identité */
+    /* ============================
+       Identité de la salle
+       ============================ */
+
     .room-detail-identity-grid {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
@@ -228,21 +111,16 @@
                 background 140ms ease;
     }
 
-    .room-detail-input:focus {
-        border-color: var(--primary, var(--accent));
-        box-shadow:
-                0 0 0 1px
-                color-mix(in srgb, var(--primary, var(--accent)) 40%, transparent);
-        background: var(--color-surface, #fff);
-    }
-
     @media (max-width: 900px) {
         .room-detail-identity-grid {
             grid-template-columns: minmax(0, 1fr);
         }
     }
 
-    /* Types */
+    /* ============================
+       Types de salle
+       ============================ */
+
     .room-detail-types-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -365,7 +243,36 @@
         border-color: var(--primary);
     }
 
-    /* Description + footer */
+    /* Focus accentué uniquement sur Nom + Surnom de la salle */
+
+    #room-name-input,
+    #room-fullname-input {
+        transition:
+                border-color 140ms ease,
+                box-shadow 140ms ease,
+                background-color 140ms ease;
+    }
+
+    #room-name-input:focus,
+    #room-fullname-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px
+        color-mix(in srgb, var(--primary) 40%, transparent);
+        background: var(--color-surface, #fff);
+    }
+
+    /* Variante dark cohérente avec les events */
+
+    [data-theme='dark'] #room-name-input:focus,
+    [data-theme='dark'] #room-fullname-input:focus {
+        background: #252f42;
+    }
+
+    /* ============================
+       Description
+       ============================ */
+
     .room-detail-textarea {
         width: 100%;
         min-height: 120px;
@@ -379,19 +286,10 @@
         color: inherit;
     }
 
-    .room-detail-textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 40%, transparent);
-    }
+    /* ============================
+       Layout 2 colonnes (main + aside)
+       ============================ */
 
-    .room-detail-actions {
-        margin-top: 1rem;
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    /* Layout 2 colonnes */
     .room-detail-layout {
         display: grid;
         grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
@@ -433,21 +331,15 @@
         }
     }
 
-    /* Thème sombre */
-    [data-theme='dark'] .room-detail-card {
-        background: var(--panel-soft);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
-        color: var(--text);
-    }
+    /* ============================
+       Thème sombre — spécifiques Rooms
+       (le fond de .detail-card est géré en commun)
+       ============================ */
 
     [data-theme='dark'] .room-detail-input {
         background: rgba(15, 23, 42, 0.85);
         border-color: var(--border-subtle);
         color: var(--text);
-    }
-
-    [data-theme='dark'] .room-detail-input:focus {
-        background: rgba(15, 23, 42, 1);
     }
 
     [data-theme='dark'] .room-type-chip {
@@ -468,10 +360,42 @@
         color: var(--text);
     }
 
-    [data-theme='dark'] .room-detail-textarea:focus {
-        background: #252f42;
-        border-color: var(--primary);
+    /* ============================
+       Couleurs de la pill selon le type de salle
+       (déjà présentes dans ton nouveau CSS)
+       ============================ */
+
+    .room-type-badge-header.room-type-td {
+        background: rgba(59, 130, 246, 0.18);
+        border-color: rgba(59, 130, 246, 0.4);
+        color: #1d4ed8;
     }
+
+    .room-type-badge-header.room-type-tp_electronique {
+        background: rgba(16, 185, 129, 0.18);
+        border-color: rgba(16, 185, 129, 0.4);
+        color: #065f46;
+    }
+
+    .room-type-badge-header.room-type-tp_numerique {
+        background: rgba(14, 165, 233, 0.18);
+        border-color: rgba(14, 165, 233, 0.4);
+        color: #0369a1;
+    }
+
+    .room-type-badge-header.room-type-projet {
+        background: rgba(234, 179, 8, 0.18);
+        border-color: rgba(234, 179, 8, 0.4);
+        color: #92400e;
+    }
+
+    .room-type-badge-header.room-type-autre {
+        background: rgba(148, 163, 184, 0.2);
+        border-color: rgba(148, 163, 184, 0.45);
+        color: #475569;
+    }
+
+    /* Dark theme – couleurs de pill uniquement */
 
     [data-theme='dark'] .room-type-badge-header.room-type-td {
         background: rgba(59, 130, 246, 0.22);
